@@ -42,6 +42,7 @@ scaler = None
 feature_names = []
 target_names = []
 feature_extractor = None
+nn_model = None
 MODELS_LOADED = False
 
 try:
