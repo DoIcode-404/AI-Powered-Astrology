@@ -5,21 +5,20 @@ Stores life outcome predictions generated from Kundali charts.
 """
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, DateTime, ForeignKey, JSON, Float, String
-from sqlalchemy.orm import relationship
-from server.database import Base
+from pydantic import BaseModel, Field
+from typing import Optional, Dict, Any
 
 
-class Prediction(Base):
+class Prediction(BaseModel):
     """
     Life outcome prediction model.
 
     Stores ML model predictions for various life domains derived from a Kundali.
 
     Attributes:
-        id: Unique prediction identifier
-        kundali_id: Associated Kundali (foreign key)
-        user_id: Owner of prediction (denormalized for query efficiency)
+        id: Unique prediction identifier (MongoDB ObjectId as string)
+        kundali_id: Associated Kundali (MongoDB ObjectId as string)
+        user_id: Owner of prediction (MongoDB ObjectId as string)
 
         Prediction scores (0-100 scale):
         career_potential: Predicted career success likelihood
@@ -33,40 +32,42 @@ class Prediction(Base):
         average_score: Average of all 8 predictions
 
         interpretation: Human-readable interpretation of predictions
+        model_version: ML model version
+        model_type: ML model type
+        raw_output: Raw model output for analysis
         created_at: When prediction was generated
         updated_at: Last update timestamp
     """
 
-    __tablename__ = "predictions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    kundali_id = Column(Integer, ForeignKey("kundalis.id"), nullable=False, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    id: Optional[str] = Field(None, alias="_id")
+    kundali_id: str
+    user_id: str
 
     # Individual prediction scores (0-100)
-    career_potential = Column(Float, nullable=False)
-    wealth_potential = Column(Float, nullable=False)
-    marriage_happiness = Column(Float, nullable=False)
-    children_prospects = Column(Float, nullable=False)
-    health_status = Column(Float, nullable=False)
-    spiritual_inclination = Column(Float, nullable=False)
-    chart_strength = Column(Float, nullable=False)
-    life_ease_score = Column(Float, nullable=False)
-    average_score = Column(Float, nullable=False)
+    career_potential: float
+    wealth_potential: float
+    marriage_happiness: float
+    children_prospects: float
+    health_status: float
+    spiritual_inclination: float
+    chart_strength: float
+    life_ease_score: float
+    average_score: float
 
     # Interpretation and metadata
-    interpretation = Column(String(1000), nullable=True)
-    model_version = Column(String(50), default="1.0.0")
-    model_type = Column(String(50), default="xgboost")
+    interpretation: Optional[str] = None
+    model_version: str = "1.0.0"
+    model_type: str = "xgboost"
 
     # Store raw model output for analysis
-    raw_output = Column(JSON, nullable=True)
+    raw_output: Optional[Dict[str, Any]] = None
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    # Relationships
-    kundali = relationship("Kundali", back_populates="predictions")
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
 
     def __repr__(self):
         return f"<Prediction(id={self.id}, kundali_id={self.kundali_id}, avg_score={self.average_score:.1f})>"

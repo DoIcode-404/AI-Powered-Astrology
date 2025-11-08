@@ -1,23 +1,21 @@
 """
-Prediction service layer for database operations.
+Prediction service layer for MongoDB database operations.
 
-Handles CRUD operations for ML predictions with database transactions.
+Handles CRUD operations for ML predictions.
 """
 
 import logging
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
-from server.models.prediction import Prediction
-from server.models.kundali import Kundali
-from server.models.user import User
+from bson import ObjectId
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
 def create_prediction(
-    db: Session,
-    user_id: int,
-    kundali_id: int,
+    db: dict,
+    user_id: str,
+    kundali_id: str,
     career_potential: float,
     wealth_potential: float,
     marriage_happiness: float,
@@ -30,14 +28,14 @@ def create_prediction(
     model_version: str = "1.0.0",
     model_type: str = "xgboost",
     raw_output: Optional[Dict[str, Any]] = None
-) -> Prediction:
+) -> Dict[str, Any]:
     """
     Create a new prediction for a Kundali.
 
     Args:
-        db: Database session
-        user_id: User ID
-        kundali_id: Associated Kundali ID
+        db: Database connection dict
+        user_id: User ID (as string)
+        kundali_id: Associated Kundali ID (as string)
         career_potential: Career success score (0-100)
         wealth_potential: Wealth success score (0-100)
         marriage_happiness: Marriage happiness score (0-100)
@@ -52,17 +50,18 @@ def create_prediction(
         raw_output: Raw model output data
 
     Returns:
-        Created Prediction object
+        Created Prediction document (with _id as string)
 
     Raises:
         ValueError: If Kundali not found or invalid data
     """
     try:
         # Verify Kundali exists and belongs to user
-        kundali = db.query(Kundali).filter(
-            Kundali.id == kundali_id,
-            Kundali.user_id == user_id
-        ).first()
+        kundalis_collection = db['kundalis']
+        kundali = kundalis_collection.find_one({
+            "_id": ObjectId(kundali_id),
+            "user_id": user_id
+        })
 
         if not kundali:
             raise ValueError(f"Kundali {kundali_id} not found for user {user_id}")
@@ -75,56 +74,59 @@ def create_prediction(
         average_score = sum(scores) / len(scores) if scores else 0
 
         # Create new prediction
-        new_prediction = Prediction(
-            kundali_id=kundali_id,
-            user_id=user_id,
-            career_potential=career_potential,
-            wealth_potential=wealth_potential,
-            marriage_happiness=marriage_happiness,
-            children_prospects=children_prospects,
-            health_status=health_status,
-            spiritual_inclination=spiritual_inclination,
-            chart_strength=chart_strength,
-            life_ease_score=life_ease_score,
-            average_score=average_score,
-            interpretation=interpretation,
-            model_version=model_version,
-            model_type=model_type,
-            raw_output=raw_output
-        )
+        prediction_doc = {
+            "kundali_id": kundali_id,
+            "user_id": user_id,
+            "career_potential": career_potential,
+            "wealth_potential": wealth_potential,
+            "marriage_happiness": marriage_happiness,
+            "children_prospects": children_prospects,
+            "health_status": health_status,
+            "spiritual_inclination": spiritual_inclination,
+            "chart_strength": chart_strength,
+            "life_ease_score": life_ease_score,
+            "average_score": average_score,
+            "interpretation": interpretation,
+            "model_version": model_version,
+            "model_type": model_type,
+            "raw_output": raw_output,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
 
-        db.add(new_prediction)
-        db.commit()
-        db.refresh(new_prediction)
+        predictions_collection = db['predictions']
+        result = predictions_collection.insert_one(prediction_doc)
 
-        logger.info(f"Prediction created: id={new_prediction.id}, kundali_id={kundali_id}")
-        return new_prediction
+        prediction_doc['_id'] = str(result.inserted_id)
+        logger.info(f"Prediction created: id={result.inserted_id}, kundali_id={kundali_id}")
+        return prediction_doc
 
     except Exception as e:
-        db.rollback()
         logger.error(f"Error creating prediction: {str(e)}")
         raise
 
 
-def get_prediction(db: Session, prediction_id: int, user_id: int) -> Optional[Prediction]:
+def get_prediction(db: dict, prediction_id: str, user_id: str) -> Optional[Dict[str, Any]]:
     """
     Get a specific prediction by ID, ensuring user ownership.
 
     Args:
-        db: Database session
-        prediction_id: Prediction ID to retrieve
-        user_id: User ID (to ensure ownership)
+        db: Database connection dict
+        prediction_id: Prediction ID (as string)
+        user_id: User ID (to ensure ownership, as string)
 
     Returns:
-        Prediction object if found and owned by user, None otherwise
+        Prediction document if found and owned by user, None otherwise
     """
     try:
-        prediction = db.query(Prediction).filter(
-            Prediction.id == prediction_id,
-            Prediction.user_id == user_id
-        ).first()
+        predictions_collection = db['predictions']
+        prediction = predictions_collection.find_one({
+            "_id": ObjectId(prediction_id),
+            "user_id": user_id
+        })
 
         if prediction:
+            prediction['_id'] = str(prediction['_id'])
             logger.info(f"Retrieved prediction: id={prediction_id}, user_id={user_id}")
         else:
             logger.warning(f"Prediction not found: id={prediction_id}, user_id={user_id}")
@@ -137,28 +139,33 @@ def get_prediction(db: Session, prediction_id: int, user_id: int) -> Optional[Pr
 
 
 def get_predictions_for_kundali(
-    db: Session,
-    kundali_id: int,
-    user_id: int
-) -> List[Prediction]:
+    db: dict,
+    kundali_id: str,
+    user_id: str
+) -> List[Dict[str, Any]]:
     """
     Get all predictions for a specific Kundali.
 
     Args:
-        db: Database session
-        kundali_id: Kundali ID
-        user_id: User ID (to ensure ownership)
+        db: Database connection dict
+        kundali_id: Kundali ID (as string)
+        user_id: User ID (to ensure ownership, as string)
 
     Returns:
-        List of Prediction objects
+        List of Prediction documents
     """
     try:
-        predictions = db.query(Prediction).filter(
-            Prediction.kundali_id == kundali_id,
-            Prediction.user_id == user_id
-        ).order_by(Prediction.created_at.desc()).all()
+        predictions_collection = db['predictions']
+        predictions = list(predictions_collection.find({
+            "kundali_id": kundali_id,
+            "user_id": user_id
+        }).sort("created_at", -1))
 
-        logger.info(f"Retrieved {len(predictions)} predictions for Kundali {kundali_id}")
+        # Convert ObjectId to string
+        for prediction in predictions:
+            prediction['_id'] = str(prediction['_id'])
+
+        logger.info(f"Retrieved {len(predictions)} predictions for kundali {kundali_id}")
         return predictions
 
     except Exception as e:
@@ -166,28 +173,28 @@ def get_predictions_for_kundali(
         raise
 
 
-def list_user_predictions(
-    db: Session,
-    user_id: int,
-    limit: int = 100,
-    offset: int = 0
-) -> List[Prediction]:
+def list_user_predictions(db: dict, user_id: str, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
     """
     Get all predictions for a user with pagination.
 
     Args:
-        db: Database session
-        user_id: User ID
-        limit: Maximum number of results
-        offset: Number of results to skip
+        db: Database connection dict
+        user_id: User ID (as string)
+        limit: Maximum number of results (default 100)
+        offset: Number of results to skip (default 0)
 
     Returns:
-        List of Prediction objects
+        List of Prediction documents
     """
     try:
-        predictions = db.query(Prediction).filter(
-            Prediction.user_id == user_id
-        ).order_by(Prediction.created_at.desc()).limit(limit).offset(offset).all()
+        predictions_collection = db['predictions']
+        predictions = list(predictions_collection.find(
+            {"user_id": user_id}
+        ).sort("created_at", -1).skip(offset).limit(limit))
+
+        # Convert ObjectId to string
+        for prediction in predictions:
+            prediction['_id'] = str(prediction['_id'])
 
         logger.info(f"Retrieved {len(predictions)} predictions for user {user_id}")
         return predictions
@@ -198,108 +205,116 @@ def list_user_predictions(
 
 
 def update_prediction(
-    db: Session,
-    prediction_id: int,
-    user_id: int,
+    db: dict,
+    prediction_id: str,
+    user_id: str,
     interpretation: Optional[str] = None,
     model_version: Optional[str] = None,
     model_type: Optional[str] = None
-) -> Optional[Prediction]:
+) -> Optional[Dict[str, Any]]:
     """
     Update a prediction's metadata.
 
     Args:
-        db: Database session
-        prediction_id: Prediction ID to update
-        user_id: User ID (to ensure ownership)
-        interpretation: Updated interpretation
-        model_version: Updated model version
-        model_type: Updated model type
+        db: Database connection dict
+        prediction_id: Prediction ID (as string)
+        user_id: User ID (to ensure ownership, as string)
+        interpretation: New interpretation (optional)
+        model_version: New model version (optional)
+        model_type: New model type (optional)
 
     Returns:
-        Updated Prediction object
+        Updated Prediction document if found, None otherwise
 
     Raises:
-        ValueError: If prediction not found
+        ValueError: If trying to update non-existent prediction
     """
     try:
-        prediction = db.query(Prediction).filter(
-            Prediction.id == prediction_id,
-            Prediction.user_id == user_id
-        ).first()
+        predictions_collection = db['predictions']
+        prediction = predictions_collection.find_one({
+            "_id": ObjectId(prediction_id),
+            "user_id": user_id
+        })
 
         if not prediction:
             raise ValueError(f"Prediction {prediction_id} not found for user {user_id}")
 
-        # Update fields
+        # Prepare update data
+        update_data = {"updated_at": datetime.utcnow()}
         if interpretation is not None:
-            prediction.interpretation = interpretation
+            update_data["interpretation"] = interpretation
         if model_version is not None:
-            prediction.model_version = model_version
+            update_data["model_version"] = model_version
         if model_type is not None:
-            prediction.model_type = model_type
+            update_data["model_type"] = model_type
 
-        db.commit()
-        db.refresh(prediction)
+        # Update document
+        predictions_collection.update_one(
+            {"_id": ObjectId(prediction_id)},
+            {"$set": update_data}
+        )
+
+        # Fetch and return updated document
+        updated_prediction = predictions_collection.find_one({"_id": ObjectId(prediction_id)})
+        updated_prediction['_id'] = str(updated_prediction['_id'])
 
         logger.info(f"Prediction updated: id={prediction_id}, user_id={user_id}")
-        return prediction
+        return updated_prediction
 
     except Exception as e:
-        db.rollback()
         logger.error(f"Error updating prediction: {str(e)}")
         raise
 
 
-def delete_prediction(db: Session, prediction_id: int, user_id: int) -> bool:
+def delete_prediction(db: dict, prediction_id: str, user_id: str) -> bool:
     """
     Delete a prediction by ID, ensuring user ownership.
 
     Args:
-        db: Database session
-        prediction_id: Prediction ID to delete
-        user_id: User ID (to ensure ownership)
+        db: Database connection dict
+        prediction_id: Prediction ID (as string)
+        user_id: User ID (to ensure ownership, as string)
 
     Returns:
         True if deleted successfully
 
     Raises:
-        ValueError: If prediction not found
+        ValueError: If trying to delete non-existent prediction
     """
     try:
-        prediction = db.query(Prediction).filter(
-            Prediction.id == prediction_id,
-            Prediction.user_id == user_id
-        ).first()
+        predictions_collection = db['predictions']
+        prediction = predictions_collection.find_one({
+            "_id": ObjectId(prediction_id),
+            "user_id": user_id
+        })
 
         if not prediction:
             raise ValueError(f"Prediction {prediction_id} not found for user {user_id}")
 
-        db.delete(prediction)
-        db.commit()
+        predictions_collection.delete_one({"_id": ObjectId(prediction_id)})
 
         logger.info(f"Prediction deleted: id={prediction_id}, user_id={user_id}")
         return True
 
     except Exception as e:
-        db.rollback()
         logger.error(f"Error deleting prediction: {str(e)}")
         raise
 
 
-def get_prediction_count(db: Session, user_id: int) -> int:
+def get_prediction_count(db: dict, user_id: str) -> int:
     """
-    Get the number of predictions for a user.
+    Get the number of predictions saved by a user.
 
     Args:
-        db: Database session
-        user_id: User ID
+        db: Database connection dict
+        user_id: User ID (as string)
 
     Returns:
         Count of predictions
     """
     try:
-        count = db.query(Prediction).filter(Prediction.user_id == user_id).count()
+        predictions_collection = db['predictions']
+        count = predictions_collection.count_documents({"user_id": user_id})
         return count
     except Exception as e:
         logger.error(f"Error counting predictions: {str(e)}")

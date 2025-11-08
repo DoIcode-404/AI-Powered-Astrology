@@ -1,205 +1,188 @@
 """
-Database configuration and connection management.
+MongoDB Database Configuration and Connection Management.
 
-Handles SQLAlchemy setup, session management, and database operations
-for Supabase PostgreSQL backend.
+Handles pymongo setup for MongoDB Atlas backend.
+Replaces previous PostgreSQL/SQLAlchemy configuration.
 """
 
 import os
 import logging
 from typing import Generator
-from sqlalchemy import create_engine, event, pool, text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from pymongo import MongoClient, ASCENDING, DESCENDING
+from pymongo.errors import ServerSelectionTimeoutError
 from dotenv import load_dotenv
+from bson import ObjectId
 
 # Load environment variables
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# Database URL from environment
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres:password@localhost:5432/kundali_db"
+# MongoDB connection URL
+MONGODB_URL = os.getenv(
+    "MONGODB_URL",
+    "mongodb+srv://astrology_user:password@astrology-db.0w3uft1.mongodb.net/?retryWrites=true&w=majority"
 )
 
-# Add SSL mode for better compatibility with cloud environments like Railway
-# If sslmode is not already in the URL, append it
-if "sslmode" not in DATABASE_URL:
-    # Use ? or & depending on whether there are already query params
-    separator = "&" if "?" in DATABASE_URL else "?"
-    DATABASE_URL = f"{DATABASE_URL}{separator}sslmode=require"
-
-# Initialize engine and session factory as None (lazy initialization)
-engine = None
-SessionLocal = None
-Base = declarative_base()
+# Initialize MongoDB client and database
+client = None
+db = None
 
 
-def _init_engine():
-    """Initialize database engine lazily to avoid import-time errors."""
-    global engine, SessionLocal
+def _init_mongo():
+    """Initialize MongoDB client and database connection."""
+    global client, db
 
-    if engine is None:
+    if client is None or db is None:
         try:
-            # SQLAlchemy engine configuration
-            # Using psycopg2 driver for PostgreSQL
-            engine = create_engine(
-                DATABASE_URL,
-                poolclass=pool.NullPool,  # Supabase recommends NullPool
-                echo=False,  # Set to True for SQL logging
-                connect_args={
-                    "connect_timeout": 10,
-                    "options": "-c statement_timeout=30000",
-                    "sslmode": "require",  # Force SSL for better compatibility
-                    "keepalives": 1,  # Enable TCP keepalives
-                    "keepalives_idle": 30,  # Send keepalive after 30s
-                    "keepalives_interval": 10,  # Retry every 10s
-                    "keepalives_count": 5  # Retry 5 times
-                }
+            # Create MongoDB client with connection pooling
+            client = MongoClient(
+                MONGODB_URL,
+                serverSelectionTimeoutMS=5000,  # 5 second timeout
+                connectTimeoutMS=10000,  # 10 second connection timeout
+                retryWrites=True,
+                w="majority"
             )
 
-            # Create session factory
-            SessionLocal = sessionmaker(
-                autocommit=False,
-                autoflush=False,
-                bind=engine
-            )
-            logger.info("Database engine initialized successfully")
-        except Exception as e:
-            logger.warning(f"Database engine initialization failed (non-fatal): {str(e)[:100]}")
-            # Return None - database operations will fail gracefully
+            # Test connection
+            client.admin.command('ping')
+            logger.info("MongoDB connection established")
+
+            # Get database reference
+            db = client['astrology_db']
+            logger.info("MongoDB database initialized")
+
+            # Create indexes
+            _create_indexes()
+
+            return True
+        except ServerSelectionTimeoutError as e:
+            logger.error(f"MongoDB connection timeout: {e}")
             return False
+        except Exception as e:
+            logger.error(f"MongoDB initialization error: {e}")
+            return False
+
     return True
 
 
-def set_sqlite_pragma(dbapi_conn, connection_record):
+def _create_indexes():
+    """Create necessary indexes for collections."""
+    try:
+        if db is None:
+            return
+
+        # Users collection indexes
+        users_collection = db['users']
+        users_collection.create_index([('email', ASCENDING)], unique=True, sparse=True)
+        users_collection.create_index([('username', ASCENDING)], unique=True, sparse=True)
+        users_collection.create_index([('created_at', DESCENDING)])
+
+        # User settings collection indexes
+        settings_collection = db['user_settings']
+        settings_collection.create_index([('user_id', ASCENDING)], unique=True, sparse=True)
+
+        # Kundalis collection indexes
+        kundalis_collection = db['kundalis']
+        kundalis_collection.create_index([('user_id', ASCENDING)])
+        kundalis_collection.create_index([('created_at', DESCENDING)])
+
+        # Predictions collection indexes
+        predictions_collection = db['predictions']
+        predictions_collection.create_index([('kundali_id', ASCENDING)])
+        predictions_collection.create_index([('user_id', ASCENDING)])
+        predictions_collection.create_index([('created_at', DESCENDING)])
+
+        logger.info("Database indexes created successfully")
+    except Exception as e:
+        logger.warning(f"Error creating indexes: {e}")
+
+
+def get_db() -> dict:
     """
-    Configure PostgreSQL connection parameters.
+    Get MongoDB database connection.
 
-    This ensures proper timezone handling and other settings.
-    """
-    if "postgresql" in DATABASE_URL:
-        try:
-            with dbapi_conn.cursor() as cursor:
-                cursor.execute("SET timezone = 'UTC'")
-        except Exception as e:
-            logger.warning(f"Failed to set timezone: {e}")
-
-
-# Register event listener after engine is initialized
-def _register_event_listener():
-    """Register database event listeners after engine initialization."""
-    global engine
-    if engine is not None:
-        event.listens_for(engine, "connect")(set_sqlite_pragma)
-
-
-def get_db() -> Generator[Session, None, None]:
-    """
-    Get database session as dependency injection.
+    Returns:
+        Dictionary with collection references for dependency injection.
 
     Usage in FastAPI routes:
-        @app.get("/items")
-        def get_items(db: Session = Depends(get_db)):
-            items = db.query(Item).all()
-            return items
-
-    Yields:
-        SQLAlchemy Session object
+        def get_items(db: dict = Depends(get_db)):
+            users = db['users'].find_one({'_id': ObjectId(user_id)})
     """
-    # Initialize engine on first use
-    _init_engine()
-    _register_event_listener()
+    _init_mongo()
 
-    if SessionLocal is None:
-        logger.error("Database engine not initialized")
-        raise RuntimeError("Database engine not available")
+    if db is None:
+        logger.error("MongoDB database not initialized")
+        raise RuntimeError("Database not available")
 
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-def init_db():
-    """
-    Initialize database tables.
-
-    Creates all tables defined in models that inherit from Base.
-    Should be called once during application startup.
-    """
-    try:
-        _init_engine()
-        _register_event_listener()
-
-        if engine is None:
-            logger.warning("Database engine not available, skipping table creation")
-            return False
-
-        logger.info("Creating database tables...")
-        Base.metadata.create_all(bind=engine)
-        logger.info("Database tables created successfully")
-        return True
-    except Exception as e:
-        logger.warning(f"Error creating database tables (non-fatal): {str(e)[:100]}")
-        return False
-
-
-def drop_all_tables():
-    """
-    Drop all tables from the database.
-
-    WARNING: This will delete all data. Use only in development/testing.
-    """
-    try:
-        _init_engine()
-        _register_event_listener()
-
-        if engine is None:
-            logger.warning("Database engine not available")
-            return False
-
-        logger.warning("Dropping all database tables...")
-        Base.metadata.drop_all(bind=engine)
-        logger.warning("All database tables dropped")
-        return True
-    except Exception as e:
-        logger.warning(f"Error dropping database tables: {str(e)[:100]}")
-        return False
+    return {
+        'users': db['users'],
+        'user_settings': db['user_settings'],
+        'kundalis': db['kundalis'],
+        'predictions': db['predictions'],
+    }
 
 
 def health_check() -> bool:
     """
-    Check database connectivity.
+    Check MongoDB connectivity.
 
     Returns:
         True if database is accessible, False otherwise
     """
     try:
-        _init_engine()
-        _register_event_listener()
+        _init_mongo()
 
-        if engine is None:
-            logger.warning("Database engine not available")
+        if client is None:
+            logger.warning("MongoDB client not initialized")
             return False
 
-        with engine.connect() as connection:
-            connection.execute(text("SELECT 1"))
-            logger.info("Database health check passed")
-            return True
+        client.admin.command('ping')
+        logger.info("MongoDB health check passed")
+        return True
     except Exception as e:
-        logger.warning(f"Database health check failed: {e}")
+        logger.warning(f"MongoDB health check failed: {e}")
         return False
+
+
+def close_db():
+    """
+    Close MongoDB connection.
+
+    Call this during application shutdown.
+    """
+    global client
+
+    if client is not None:
+        try:
+            client.close()
+            logger.info("MongoDB connection closed")
+        except Exception as e:
+            logger.warning(f"Error closing MongoDB connection: {e}")
+        finally:
+            client = None
 
 
 def reset_db():
     """
-    Reset database by dropping and recreating all tables.
+    Reset database by dropping all collections.
 
     WARNING: This will delete all data. Use only in development.
     """
-    drop_all_tables()
-    init_db()
+    try:
+        _init_mongo()
+
+        if db is None:
+            logger.warning("MongoDB database not initialized")
+            return False
+
+        # Drop all collections
+        for collection_name in db.list_collection_names():
+            db[collection_name].drop()
+            logger.warning(f"Dropped collection: {collection_name}")
+
+        logger.warning("Database reset completed")
+        return True
+    except Exception as e:
+        logger.warning(f"Error resetting database: {e}")
+        return False

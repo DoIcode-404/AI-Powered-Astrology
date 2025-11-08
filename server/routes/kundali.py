@@ -1,5 +1,5 @@
 """
-Kundali Routes
+Kundali Routes - MongoDB Compatible
 Handles Kundali generation and analysis endpoints.
 
 All responses follow standardized APIResponse format.
@@ -9,8 +9,9 @@ Author: Backend API Team
 
 from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, Field
-from sqlalchemy.orm import Session
 from typing import Optional
+from bson import ObjectId
+from datetime import datetime
 import logging
 import time
 
@@ -183,7 +184,7 @@ async def calculate_synastry(request: SynastryRequest) -> APIResponse:
 async def save_kundali_chart(
     request: KundaliSaveRequest,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Save a generated Kundali to user's profile.
@@ -193,7 +194,7 @@ async def save_kundali_chart(
     Args:
         request: Kundali data to save
         user: Authenticated user
-        db: Database session
+        db: Database connection (MongoDB)
 
     Returns:
         APIResponse with saved Kundali data
@@ -205,7 +206,7 @@ async def save_kundali_chart(
 
         logger.info(f"Saving Kundali for user: {user.email}")
 
-        # Save to database
+        # Save to database - MongoDB version returns dict with '_id' as string
         saved_kundali = save_kundali(
             db=db,
             user_id=user.id,
@@ -221,18 +222,18 @@ async def save_kundali_chart(
 
         # Convert to response schema
         response_data = KundaliResponse(
-            id=saved_kundali.id,
-            user_id=saved_kundali.user_id,
-            name=saved_kundali.name,
-            birth_date=saved_kundali.birth_date,
-            birth_time=saved_kundali.birth_time,
-            latitude=float(saved_kundali.latitude),
-            longitude=float(saved_kundali.longitude),
-            timezone=saved_kundali.timezone,
-            kundali_data=saved_kundali.kundali_data,
-            ml_features=saved_kundali.ml_features,
-            created_at=saved_kundali.created_at,
-            updated_at=saved_kundali.updated_at,
+            id=saved_kundali['_id'],
+            user_id=saved_kundali['user_id'],
+            name=saved_kundali['name'],
+            birth_date=saved_kundali['birth_date'],
+            birth_time=saved_kundali['birth_time'],
+            latitude=float(saved_kundali['latitude']),
+            longitude=float(saved_kundali['longitude']),
+            timezone=saved_kundali['timezone'],
+            kundali_data=saved_kundali['kundali_data'],
+            ml_features=saved_kundali.get('ml_features'),
+            created_at=saved_kundali['created_at'],
+            updated_at=saved_kundali['updated_at'],
         )
 
         return success_response(
@@ -261,7 +262,7 @@ async def save_kundali_chart(
 @router.get('/list', response_model=APIResponse, tags=["Kundali"])
 async def list_kundalis(
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: dict = Depends(get_db),
     limit: int = 100,
     offset: int = 0
 ) -> APIResponse:
@@ -291,10 +292,10 @@ async def list_kundalis(
         # Convert to response schema
         kundali_list = [
             KundaliListResponse(
-                id=k.id,
-                name=k.name,
-                birth_date=k.birth_date,
-                created_at=k.created_at
+                id=k['_id'],
+                name=k['name'],
+                birth_date=k['birth_date'],
+                created_at=k['created_at']
             )
             for k in kundalis
         ]
@@ -320,9 +321,9 @@ async def list_kundalis(
 
 @router.get('/{kundali_id}', response_model=APIResponse, tags=["Kundali"])
 async def get_kundali_detail(
-    kundali_id: int,
+    kundali_id: str,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Get details of a specific Kundali.
@@ -330,7 +331,7 @@ async def get_kundali_detail(
     Requires authentication token in Authorization header.
 
     Args:
-        kundali_id: ID of the Kundali to retrieve
+        kundali_id: ID of the Kundali to retrieve (MongoDB ObjectId as string)
 
     Returns:
         APIResponse with complete Kundali data
@@ -353,18 +354,18 @@ async def get_kundali_detail(
 
         # Convert to response schema
         response_data = KundaliResponse(
-            id=kundali.id,
-            user_id=kundali.user_id,
-            name=kundali.name,
-            birth_date=kundali.birth_date,
-            birth_time=kundali.birth_time,
-            latitude=float(kundali.latitude),
-            longitude=float(kundali.longitude),
-            timezone=kundali.timezone,
-            kundali_data=kundali.kundali_data,
-            ml_features=kundali.ml_features,
-            created_at=kundali.created_at,
-            updated_at=kundali.updated_at,
+            id=kundali['_id'],
+            user_id=kundali['user_id'],
+            name=kundali['name'],
+            birth_date=kundali['birth_date'],
+            birth_time=kundali['birth_time'],
+            latitude=float(kundali['latitude']),
+            longitude=float(kundali['longitude']),
+            timezone=kundali['timezone'],
+            kundali_data=kundali['kundali_data'],
+            ml_features=kundali.get('ml_features'),
+            created_at=kundali['created_at'],
+            updated_at=kundali['updated_at'],
         )
 
         return success_response(
@@ -383,10 +384,10 @@ async def get_kundali_detail(
 
 @router.put('/{kundali_id}', response_model=APIResponse, tags=["Kundali"])
 async def update_kundali_chart(
-    kundali_id: int,
+    kundali_id: str,
     request: KundaliUpdateRequest,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Update a saved Kundali's name and/or ML features.
@@ -394,10 +395,10 @@ async def update_kundali_chart(
     Requires authentication token in Authorization header.
 
     Args:
-        kundali_id: ID of the Kundali to update
+        kundali_id: ID of the Kundali to update (MongoDB ObjectId as string)
         request: Update request with new data
         user: Authenticated user
-        db: Database session
+        db: Database connection (MongoDB)
 
     Returns:
         APIResponse with updated Kundali data
@@ -420,18 +421,18 @@ async def update_kundali_chart(
 
         # Convert to response schema
         response_data = KundaliResponse(
-            id=updated_kundali.id,
-            user_id=updated_kundali.user_id,
-            name=updated_kundali.name,
-            birth_date=updated_kundali.birth_date,
-            birth_time=updated_kundali.birth_time,
-            latitude=float(updated_kundali.latitude),
-            longitude=float(updated_kundali.longitude),
-            timezone=updated_kundali.timezone,
-            kundali_data=updated_kundali.kundali_data,
-            ml_features=updated_kundali.ml_features,
-            created_at=updated_kundali.created_at,
-            updated_at=updated_kundali.updated_at,
+            id=updated_kundali['_id'],
+            user_id=updated_kundali['user_id'],
+            name=updated_kundali['name'],
+            birth_date=updated_kundali['birth_date'],
+            birth_time=updated_kundali['birth_time'],
+            latitude=float(updated_kundali['latitude']),
+            longitude=float(updated_kundali['longitude']),
+            timezone=updated_kundali['timezone'],
+            kundali_data=updated_kundali['kundali_data'],
+            ml_features=updated_kundali.get('ml_features'),
+            created_at=updated_kundali['created_at'],
+            updated_at=updated_kundali['updated_at'],
         )
 
         return success_response(
@@ -458,9 +459,9 @@ async def update_kundali_chart(
 
 @router.delete('/{kundali_id}', response_model=APIResponse, tags=["Kundali"])
 async def delete_kundali_chart(
-    kundali_id: int,
+    kundali_id: str,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Delete a saved Kundali.
@@ -468,9 +469,9 @@ async def delete_kundali_chart(
     Requires authentication token in Authorization header.
 
     Args:
-        kundali_id: ID of the Kundali to delete
+        kundali_id: ID of the Kundali to delete (MongoDB ObjectId as string)
         user: Authenticated user
-        db: Database session
+        db: Database connection (MongoDB)
 
     Returns:
         APIResponse confirming deletion
@@ -517,7 +518,7 @@ async def delete_kundali_chart(
 @router.get('/history', response_model=APIResponse, tags=["Kundali"])
 async def get_kundali_history(
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Deprecated: Use /list endpoint instead.
@@ -540,10 +541,10 @@ async def get_kundali_history(
         # Convert to response schema
         kundali_list = [
             KundaliListResponse(
-                id=k.id,
-                name=k.name,
-                birth_date=k.birth_date,
-                created_at=k.created_at
+                id=k['_id'],
+                name=k['name'],
+                birth_date=k['birth_date'],
+                created_at=k['created_at']
             )
             for k in kundalis
         ]

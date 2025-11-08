@@ -1,5 +1,5 @@
 """
-Prediction CRUD Routes
+Prediction CRUD Routes - MongoDB Compatible
 
 Handles saving, retrieving, updating, and deleting ML predictions.
 
@@ -10,7 +10,6 @@ Author: Backend API Team
 
 import logging
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 
 from server.pydantic_schemas.prediction_db_schema import (
     PredictionCreateRequest,
@@ -42,7 +41,7 @@ router = APIRouter()
 async def create_prediction_endpoint(
     request: PredictionCreateRequest,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Create a new prediction for a Kundali.
@@ -131,7 +130,7 @@ async def create_prediction_endpoint(
 @router.get('/list', response_model=APIResponse, tags=["Predictions"])
 async def list_predictions(
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: dict = Depends(get_db),
     limit: int = 100,
     offset: int = 0
 ) -> APIResponse:
@@ -190,9 +189,9 @@ async def list_predictions(
 
 @router.get('/{prediction_id}', response_model=APIResponse, tags=["Predictions"])
 async def get_prediction_endpoint(
-    prediction_id: int,
+    prediction_id: str,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Get details of a specific prediction.
@@ -259,9 +258,9 @@ async def get_prediction_endpoint(
 
 @router.get('/kundali/{kundali_id}', response_model=APIResponse, tags=["Predictions"])
 async def get_kundali_predictions(
-    kundali_id: int,
+    kundali_id: str,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Get all predictions for a specific Kundali.
@@ -311,10 +310,10 @@ async def get_kundali_predictions(
 
 @router.put('/{prediction_id}', response_model=APIResponse, tags=["Predictions"])
 async def update_prediction_endpoint(
-    prediction_id: int,
+    prediction_id: str,
     request: PredictionUpdateRequest,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Update a prediction's metadata.
@@ -393,9 +392,9 @@ async def update_prediction_endpoint(
 
 @router.delete('/{prediction_id}', response_model=APIResponse, tags=["Predictions"])
 async def delete_prediction_endpoint(
-    prediction_id: int,
+    prediction_id: str,
     user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> APIResponse:
     """
     Delete a prediction.

@@ -5,20 +5,19 @@ Stores complete Kundali data generated from birth details.
 """
 
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, JSON, Text
-from sqlalchemy.orm import relationship
-from server.database import Base
+from pydantic import BaseModel, Field
+from typing import Optional, Dict, Any
 
 
-class Kundali(Base):
+class Kundali(BaseModel):
     """
     Kundali (birth chart) model.
 
     Stores complete Kundali data including planets, houses, strengths, etc.
 
     Attributes:
-        id: Unique Kundali identifier
-        user_id: Owner of this Kundali (foreign key)
+        id: Unique Kundali identifier (MongoDB ObjectId as string)
+        user_id: Owner of this Kundali (MongoDB ObjectId as string)
         name: User-given name for this Kundali (e.g., "My Chart", "Father's Chart")
         birth_date: Date of birth (YYYY-MM-DD)
         birth_time: Time of birth (HH:MM:SS)
@@ -26,33 +25,27 @@ class Kundali(Base):
         longitude: Birth location longitude
         timezone: Birth location timezone
         kundali_data: Complete Kundali JSON data
+        ml_features: Pre-calculated ML features for ML predictions
         created_at: When this Kundali was generated
         updated_at: Last update timestamp
     """
 
-    __tablename__ = "kundalis"
+    id: Optional[str] = Field(None, alias="_id")
+    user_id: str
+    name: str = "My Kundali"
+    birth_date: str  # YYYY-MM-DD
+    birth_time: str  # HH:MM:SS
+    latitude: str
+    longitude: str
+    timezone: str
+    kundali_data: Dict[str, Any]
+    ml_features: Optional[Dict[str, Any]] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    name = Column(String(255), nullable=False, default="My Kundali")
-    birth_date = Column(String(10), nullable=False)  # YYYY-MM-DD
-    birth_time = Column(String(8), nullable=False)   # HH:MM:SS
-    latitude = Column(String(10), nullable=False)
-    longitude = Column(String(10), nullable=False)
-    timezone = Column(String(50), nullable=False)
-
-    # Store complete Kundali data as JSON
-    kundali_data = Column(JSON, nullable=False)
-
-    # Store calculated ML features for quick access
-    ml_features = Column(JSON, nullable=True)
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    # Relationships
-    user = relationship("User", back_populates="kundalis")
-    predictions = relationship("Prediction", back_populates="kundali", cascade="all, delete-orphan")
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
 
     def __repr__(self):
         return f"<Kundali(id={self.id}, user_id={self.user_id}, name={self.name})>"

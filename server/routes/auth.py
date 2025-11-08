@@ -1,17 +1,17 @@
 """
-Authentication Routes with Database Backend
+Authentication Routes with MongoDB Backend
 
 Handles user registration, login, token refresh, and profile management.
-Uses SQLAlchemy database backend with JWT tokens.
+Uses MongoDB database backend with JWT tokens.
 All responses follow standardized APIResponse format.
 
 Author: Backend API Team
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, status, Header
-from sqlalchemy.orm import Session
+from bson import ObjectId
 
 from server.database import get_db
 from server.models.user import User
@@ -43,7 +43,7 @@ router = APIRouter()
 
 def get_current_user(
     authorization: str = Header(None),
-    db: Session = Depends(get_db)
+    db: dict = Depends(get_db)
 ) -> User:
     """
     Get current authenticated user from JWT token.
@@ -55,7 +55,7 @@ def get_current_user(
 
     Args:
         authorization: Authorization header in format "Bearer <token>"
-        db: Database session
+        db: Database connection dict
 
     Returns:
         User object
@@ -95,26 +95,38 @@ def get_current_user(
             http_status=401,
         )
 
-    # Get user from database
-    user = db.query(User).filter(User.id == token_data.user_id).first()
-    if not user:
-        return error_response(
-            code="USER_NOT_FOUND",
-            message="User not found",
-            http_status=404,
-        )
+    # Get user from MongoDB
+    try:
+        users_collection = db['users']
+        user_doc = users_collection.find_one({"_id": ObjectId(token_data.user_id)})
+        if not user_doc:
+            return error_response(
+                code="USER_NOT_FOUND",
+                message="User not found",
+                http_status=404,
+            )
 
-    return user
+        # Convert MongoDB document to User model
+        user_doc['_id'] = str(user_doc['_id'])
+        user = User(**user_doc)
+        return user
+    except Exception as e:
+        logger.error(f"Error fetching user: {e}")
+        return error_response(
+            code="USER_FETCH_ERROR",
+            message="Failed to retrieve user",
+            http_status=500,
+        )
 
 
 @router.post("/register", response_model=APIResponse, status_code=201, tags=["Authentication"])
-async def register(request: UserRegisterRequest, db: Session = Depends(get_db)) -> APIResponse:
+async def register(request: UserRegisterRequest, db: dict = Depends(get_db)) -> APIResponse:
     """
     Register a new user account.
 
     Args:
         request: Registration request with email, username, password
-        db: Database session
+        db: Database connection dict
 
     Returns:
         APIResponse with user data and tokens
@@ -122,8 +134,11 @@ async def register(request: UserRegisterRequest, db: Session = Depends(get_db)) 
     try:
         logger.info(f"Registration attempt for email: {request.email}")
 
+        users_collection = db['users']
+        settings_collection = db['user_settings']
+
         # Check if email already exists
-        existing_email = db.query(User).filter(User.email == request.email).first()
+        existing_email = users_collection.find_one({"email": request.email})
         if existing_email:
             return error_response(
                 code="EMAIL_ALREADY_EXISTS",
@@ -132,7 +147,7 @@ async def register(request: UserRegisterRequest, db: Session = Depends(get_db)) 
             )
 
         # Check if username already exists
-        existing_username = db.query(User).filter(User.username == request.username).first()
+        existing_username = users_collection.find_one({"username": request.username})
         if existing_username:
             return error_response(
                 code="USERNAME_ALREADY_EXISTS",
@@ -142,40 +157,58 @@ async def register(request: UserRegisterRequest, db: Session = Depends(get_db)) 
 
         # Create new user
         hashed_password = hash_password(request.password)
-        new_user = User(
-            email=request.email,
-            username=request.username,
-            hashed_password=hashed_password,
-            full_name=request.full_name,
-            is_active=True,
-        )
+        user_doc = {
+            "email": request.email,
+            "username": request.username,
+            "hashed_password": hashed_password,
+            "full_name": request.full_name,
+            "is_active": True,
+            "is_verified": False,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "last_login": None,
+        }
 
-        db.add(new_user)
-        db.flush()  # Flush to get the user ID
+        # Insert user
+        result = users_collection.insert_one(user_doc)
+        user_id = str(result.inserted_id)
+        logger.info(f"User registered successfully: {request.email}")
 
         # Create user settings
-        user_settings = UserSettings(user_id=new_user.id)
-        db.add(user_settings)
-
-        db.commit()
-        logger.info(f"User registered successfully: {request.email}")
+        settings_doc = {
+            "user_id": user_id,
+            "theme": "light",
+            "language": "en",
+            "notifications_enabled": True,
+            "notification_preferences": {
+                "email_on_prediction": True,
+                "email_on_kundali_saved": True,
+                "email_newsletter": False,
+            },
+            "default_timezone": "UTC",
+            "preferences": {},
+            "updated_at": datetime.utcnow(),
+        }
+        settings_collection.insert_one(settings_doc)
 
         # Create tokens
         tokens = create_tokens(
-            user_id=new_user.id,
-            email=new_user.email,
-            username=new_user.username,
+            user_id=user_id,
+            email=request.email,
+            username=request.username,
         )
 
+        # Prepare response
+        user_doc['_id'] = user_id
         user_response = UserResponse(
-            id=new_user.id,
-            email=new_user.email,
-            username=new_user.username,
-            full_name=new_user.full_name,
-            is_active=new_user.is_active,
-            is_verified=new_user.is_verified,
-            created_at=new_user.created_at,
-            last_login=new_user.last_login,
+            id=user_id,
+            email=user_doc['email'],
+            username=user_doc['username'],
+            full_name=user_doc['full_name'],
+            is_active=user_doc['is_active'],
+            is_verified=user_doc['is_verified'],
+            created_at=user_doc['created_at'],
+            last_login=user_doc['last_login'],
         )
 
         return success_response(
@@ -192,7 +225,6 @@ async def register(request: UserRegisterRequest, db: Session = Depends(get_db)) 
         )
 
     except Exception as e:
-        db.rollback()
         logger.error(f"Registration error: {str(e)}", exc_info=True)
         return error_response(
             code="REGISTRATION_FAILED",
@@ -202,13 +234,13 @@ async def register(request: UserRegisterRequest, db: Session = Depends(get_db)) 
 
 
 @router.post("/login", response_model=APIResponse, tags=["Authentication"])
-async def login(request: UserLoginRequest, db: Session = Depends(get_db)) -> APIResponse:
+async def login(request: UserLoginRequest, db: dict = Depends(get_db)) -> APIResponse:
     """
     Authenticate user and return JWT tokens.
 
     Args:
         request: Login credentials (email, password)
-        db: Database session
+        db: Database connection dict
 
     Returns:
         APIResponse with user data and tokens
@@ -216,9 +248,11 @@ async def login(request: UserLoginRequest, db: Session = Depends(get_db)) -> API
     try:
         logger.info(f"Login attempt for email: {request.email}")
 
+        users_collection = db['users']
+
         # Find user by email
-        user = db.query(User).filter(User.email == request.email).first()
-        if not user:
+        user_doc = users_collection.find_one({"email": request.email})
+        if not user_doc:
             return error_response(
                 code="INVALID_CREDENTIALS",
                 message="Invalid email or password",
@@ -226,7 +260,7 @@ async def login(request: UserLoginRequest, db: Session = Depends(get_db)) -> API
             )
 
         # Verify password
-        if not verify_password(request.password, user.hashed_password):
+        if not verify_password(request.password, user_doc['hashed_password']):
             return error_response(
                 code="INVALID_CREDENTIALS",
                 message="Invalid email or password",
@@ -234,7 +268,7 @@ async def login(request: UserLoginRequest, db: Session = Depends(get_db)) -> API
             )
 
         # Check if user is active
-        if not user.is_active:
+        if not user_doc['is_active']:
             return error_response(
                 code="ACCOUNT_INACTIVE",
                 message="Account has been deactivated",
@@ -242,27 +276,31 @@ async def login(request: UserLoginRequest, db: Session = Depends(get_db)) -> API
             )
 
         # Update last login
-        user.last_login = datetime.utcnow()
-        db.commit()
+        user_id = user_doc['_id']
+        users_collection.update_one(
+            {"_id": user_id},
+            {"$set": {"last_login": datetime.utcnow(), "updated_at": datetime.utcnow()}}
+        )
 
         logger.info(f"User logged in successfully: {request.email}")
 
         # Create tokens
+        user_id_str = str(user_id)
         tokens = create_tokens(
-            user_id=user.id,
-            email=user.email,
-            username=user.username,
+            user_id=user_id_str,
+            email=user_doc['email'],
+            username=user_doc['username'],
         )
 
         user_response = UserResponse(
-            id=user.id,
-            email=user.email,
-            username=user.username,
-            full_name=user.full_name,
-            is_active=user.is_active,
-            is_verified=user.is_verified,
-            created_at=user.created_at,
-            last_login=user.last_login,
+            id=user_id_str,
+            email=user_doc['email'],
+            username=user_doc['username'],
+            full_name=user_doc['full_name'],
+            is_active=user_doc['is_active'],
+            is_verified=user_doc['is_verified'],
+            created_at=user_doc['created_at'],
+            last_login=user_doc['last_login'],
         )
 
         return success_response(
