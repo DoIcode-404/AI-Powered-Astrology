@@ -18,6 +18,7 @@ PyJWT==2.10.1
 
 # Astrology Calculations
 pymeeus==0.5.11
+pytz==2024.1
 
 # API & HTTP
 httpx==0.25.1
