@@ -44,7 +44,12 @@ def _init_engine():
                 echo=False,  # Set to True for SQL logging
                 connect_args={
                     "connect_timeout": 10,
-                    "options": "-c statement_timeout=30000"
+                    "options": "-c statement_timeout=30000",
+                    "sslmode": "require",  # Force SSL for better compatibility
+                    "keepalives": 1,  # Enable TCP keepalives
+                    "keepalives_idle": 30,  # Send keepalive after 30s
+                    "keepalives_interval": 10,  # Retry every 10s
+                    "keepalives_count": 5  # Retry 5 times
                 }
             )
 
