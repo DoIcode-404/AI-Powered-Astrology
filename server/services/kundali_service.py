@@ -1,36 +1,35 @@
 """
-Kundali service layer for database operations.
+Kundali service layer for MongoDB database operations.
 
-Handles CRUD operations for Kundali charts with database transactions.
+Handles CRUD operations for Kundali charts.
 """
 
 import logging
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
-from server.models.kundali import Kundali
-from server.models.user import User
+from bson import ObjectId
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
 def save_kundali(
-    db: Session,
-    user_id: int,
+    db: dict,
+    user_id: str,
     name: str,
     birth_date: str,
     birth_time: str,
-    latitude: float,
-    longitude: float,
+    latitude: str,
+    longitude: str,
     timezone: str,
     kundali_data: Dict[str, Any],
-    ml_features: Optional[Dict[str, float]] = None
-) -> Kundali:
+    ml_features: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """
     Save a new Kundali for a user.
 
     Args:
-        db: Database session
-        user_id: User ID
+        db: Database connection dict
+        user_id: User ID (MongoDB ObjectId as string)
         name: Kundali name
         birth_date: Birth date (YYYY-MM-DD)
         birth_time: Birth time (HH:MM:SS)
@@ -41,62 +40,66 @@ def save_kundali(
         ml_features: Optional ML features dictionary
 
     Returns:
-        Saved Kundali object
+        Saved Kundali document (with _id as string)
 
     Raises:
         ValueError: If user not found or invalid data
     """
     try:
         # Verify user exists
-        user = db.query(User).filter(User.id == user_id).first()
+        users_collection = db['users']
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
         if not user:
             raise ValueError(f"User with id {user_id} not found")
 
         # Create new Kundali
-        new_kundali = Kundali(
-            user_id=user_id,
-            name=name,
-            birth_date=birth_date,
-            birth_time=birth_time,
-            latitude=str(latitude),
-            longitude=str(longitude),
-            timezone=timezone,
-            kundali_data=kundali_data,
-            ml_features=ml_features
-        )
+        kundali_doc = {
+            "user_id": user_id,
+            "name": name,
+            "birth_date": birth_date,
+            "birth_time": birth_time,
+            "latitude": str(latitude),
+            "longitude": str(longitude),
+            "timezone": timezone,
+            "kundali_data": kundali_data,
+            "ml_features": ml_features,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
 
-        db.add(new_kundali)
-        db.commit()
-        db.refresh(new_kundali)
+        kundalis_collection = db['kundalis']
+        result = kundalis_collection.insert_one(kundali_doc)
 
-        logger.info(f"Kundali saved: id={new_kundali.id}, user_id={user_id}, name={name}")
-        return new_kundali
+        kundali_doc['_id'] = str(result.inserted_id)
+        logger.info(f"Kundali saved: id={result.inserted_id}, user_id={user_id}, name={name}")
+        return kundali_doc
 
     except Exception as e:
-        db.rollback()
         logger.error(f"Error saving Kundali: {str(e)}")
         raise
 
 
-def get_kundali(db: Session, kundali_id: int, user_id: int) -> Optional[Kundali]:
+def get_kundali(db: dict, kundali_id: str, user_id: str) -> Optional[Dict[str, Any]]:
     """
     Get a specific Kundali by ID, ensuring ownership.
 
     Args:
-        db: Database session
-        kundali_id: Kundali ID to retrieve
-        user_id: User ID (to ensure ownership)
+        db: Database connection dict
+        kundali_id: Kundali ID (MongoDB ObjectId as string)
+        user_id: User ID (to ensure ownership, as string)
 
     Returns:
-        Kundali object if found and owned by user, None otherwise
+        Kundali document if found and owned by user, None otherwise
     """
     try:
-        kundali = db.query(Kundali).filter(
-            Kundali.id == kundali_id,
-            Kundali.user_id == user_id
-        ).first()
+        kundalis_collection = db['kundalis']
+        kundali = kundalis_collection.find_one({
+            "_id": ObjectId(kundali_id),
+            "user_id": user_id
+        })
 
         if kundali:
+            kundali['_id'] = str(kundali['_id'])
             logger.info(f"Retrieved Kundali: id={kundali_id}, user_id={user_id}")
         else:
             logger.warning(f"Kundali not found: id={kundali_id}, user_id={user_id}")
@@ -108,23 +111,28 @@ def get_kundali(db: Session, kundali_id: int, user_id: int) -> Optional[Kundali]
         raise
 
 
-def list_user_kundalis(db: Session, user_id: int, limit: int = 100, offset: int = 0) -> List[Kundali]:
+def list_user_kundalis(db: dict, user_id: str, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
     """
     Get all Kundalis for a specific user with pagination.
 
     Args:
-        db: Database session
-        user_id: User ID
+        db: Database connection dict
+        user_id: User ID (as string)
         limit: Maximum number of results (default 100)
         offset: Number of results to skip (default 0)
 
     Returns:
-        List of Kundali objects
+        List of Kundali documents
     """
     try:
-        kundalis = db.query(Kundali).filter(
-            Kundali.user_id == user_id
-        ).order_by(Kundali.created_at.desc()).limit(limit).offset(offset).all()
+        kundalis_collection = db['kundalis']
+        kundalis = list(kundalis_collection.find(
+            {"user_id": user_id}
+        ).sort("created_at", -1).skip(offset).limit(limit))
+
+        # Convert ObjectId to string
+        for kundali in kundalis:
+            kundali['_id'] = str(kundali['_id'])
 
         logger.info(f"Retrieved {len(kundalis)} Kundalis for user {user_id}")
         return kundalis
@@ -135,104 +143,112 @@ def list_user_kundalis(db: Session, user_id: int, limit: int = 100, offset: int 
 
 
 def update_kundali(
-    db: Session,
-    kundali_id: int,
-    user_id: int,
+    db: dict,
+    kundali_id: str,
+    user_id: str,
     name: Optional[str] = None,
-    ml_features: Optional[Dict[str, float]] = None
-) -> Optional[Kundali]:
+    ml_features: Optional[Dict[str, Any]] = None
+) -> Optional[Dict[str, Any]]:
     """
     Update a Kundali's name and/or ML features.
 
     Args:
-        db: Database session
-        kundali_id: Kundali ID to update
-        user_id: User ID (to ensure ownership)
+        db: Database connection dict
+        kundali_id: Kundali ID (as string)
+        user_id: User ID (to ensure ownership, as string)
         name: New name (optional)
         ml_features: Updated ML features (optional)
 
     Returns:
-        Updated Kundali object if found, None otherwise
+        Updated Kundali document if found, None otherwise
 
     Raises:
         ValueError: If trying to update non-existent Kundali
     """
     try:
-        kundali = db.query(Kundali).filter(
-            Kundali.id == kundali_id,
-            Kundali.user_id == user_id
-        ).first()
+        kundalis_collection = db['kundalis']
+        kundali = kundalis_collection.find_one({
+            "_id": ObjectId(kundali_id),
+            "user_id": user_id
+        })
 
         if not kundali:
             raise ValueError(f"Kundali {kundali_id} not found for user {user_id}")
 
-        # Update fields
+        # Prepare update data
+        update_data = {"updated_at": datetime.utcnow()}
         if name is not None:
-            kundali.name = name
+            update_data["name"] = name
         if ml_features is not None:
-            kundali.ml_features = ml_features
+            update_data["ml_features"] = ml_features
 
-        db.commit()
-        db.refresh(kundali)
+        # Update document
+        kundalis_collection.update_one(
+            {"_id": ObjectId(kundali_id)},
+            {"$set": update_data}
+        )
+
+        # Fetch and return updated document
+        updated_kundali = kundalis_collection.find_one({"_id": ObjectId(kundali_id)})
+        updated_kundali['_id'] = str(updated_kundali['_id'])
 
         logger.info(f"Kundali updated: id={kundali_id}, user_id={user_id}")
-        return kundali
+        return updated_kundali
 
     except Exception as e:
-        db.rollback()
         logger.error(f"Error updating Kundali: {str(e)}")
         raise
 
 
-def delete_kundali(db: Session, kundali_id: int, user_id: int) -> bool:
+def delete_kundali(db: dict, kundali_id: str, user_id: str) -> bool:
     """
     Delete a Kundali by ID, ensuring ownership.
 
     Args:
-        db: Database session
-        kundali_id: Kundali ID to delete
-        user_id: User ID (to ensure ownership)
+        db: Database connection dict
+        kundali_id: Kundali ID (as string)
+        user_id: User ID (to ensure ownership, as string)
 
     Returns:
-        True if deleted successfully, False if not found
+        True if deleted successfully
 
     Raises:
         ValueError: If trying to delete non-existent Kundali
     """
     try:
-        kundali = db.query(Kundali).filter(
-            Kundali.id == kundali_id,
-            Kundali.user_id == user_id
-        ).first()
+        kundalis_collection = db['kundalis']
+        kundali = kundalis_collection.find_one({
+            "_id": ObjectId(kundali_id),
+            "user_id": user_id
+        })
 
         if not kundali:
             raise ValueError(f"Kundali {kundali_id} not found for user {user_id}")
 
-        db.delete(kundali)
-        db.commit()
+        kundalis_collection.delete_one({"_id": ObjectId(kundali_id)})
 
         logger.info(f"Kundali deleted: id={kundali_id}, user_id={user_id}")
         return True
 
     except Exception as e:
-        db.rollback()
         logger.error(f"Error deleting Kundali: {str(e)}")
         raise
 
 
-def get_kundali_count(db: Session, user_id: int) -> int:
+def get_kundali_count(db: dict, user_id: str) -> int:
     """
     Get the number of Kundalis saved by a user.
 
     Args:
-        db: Database session
-        user_id: User ID
+        db: Database connection dict
+        user_id: User ID (as string)
 
     Returns:
         Count of Kundalis
     """
     try:
-        count = db.query(Kundali).filter(Kundali.user_id == user_id).count()
+        kundalis_collection = db['kundalis']
+        count = kundalis_collection.count_documents({"user_id": user_id})
         return count
     except Exception as e:
         logger.error(f"Error counting Kundalis: {str(e)}")
