@@ -16,7 +16,7 @@ class PredictionCreateRequest(BaseModel):
         "protected_namespaces": (),
         "json_schema_extra": {
             "example": {
-                "kundali_id": 1,
+                "kundali_id": "690f866a1a9023ffe1b1c096",
                 "career_potential": 0.85,
                 "wealth_potential": 0.72,
                 "marriage_happiness": 0.88,
@@ -32,7 +32,7 @@ class PredictionCreateRequest(BaseModel):
         }
     }
 
-    kundali_id: int = Field(..., description="Associated Kundali ID")
+    kundali_id: str = Field(..., description="Associated Kundali ID")
     career_potential: float = Field(..., ge=0, le=100, description="Career success score (0-100)")
     wealth_potential: float = Field(..., ge=0, le=100, description="Wealth success score (0-100)")
     marriage_happiness: float = Field(..., ge=0, le=100, description="Marriage happiness score (0-100)")
@@ -74,9 +74,9 @@ class PredictionResponse(BaseModel):
         "from_attributes": True,
         "json_schema_extra": {
             "example": {
-                "id": 1,
-                "kundali_id": 1,
-                "user_id": 1,
+                "id": "690f866a1a9023ffe1b1c096",
+                "kundali_id": "690f866a1a9023ffe1b1c096",
+                "user_id": "690f866a1a9023ffe1b1c096",
                 "career_potential": 0.85,
                 "wealth_potential": 0.72,
                 "marriage_happiness": 0.88,
@@ -95,9 +95,9 @@ class PredictionResponse(BaseModel):
         }
     }
 
-    id: int = Field(..., description="Prediction ID")
-    kundali_id: int = Field(..., description="Associated Kundali ID")
-    user_id: int = Field(..., description="User ID")
+    id: str = Field(..., description="Prediction ID")
+    kundali_id: str = Field(..., description="Associated Kundali ID")
+    user_id: str = Field(..., description="User ID")
     career_potential: float = Field(..., description="Career success score")
     wealth_potential: float = Field(..., description="Wealth success score")
     marriage_happiness: float = Field(..., description="Marriage happiness score")
@@ -118,16 +118,16 @@ class PredictionResponse(BaseModel):
 class PredictionListResponse(BaseModel):
     """Response for listing predictions (summary view)."""
 
-    id: int = Field(..., description="Prediction ID")
-    kundali_id: int = Field(..., description="Associated Kundali ID")
+    id: str = Field(..., description="Prediction ID")
+    kundali_id: str = Field(..., description="Associated Kundali ID")
     average_score: float = Field(..., description="Average prediction score")
     created_at: datetime = Field(..., description="Creation timestamp")
 
     class Config:
         from_attributes = True
         example = {
-            "id": 1,
-            "kundali_id": 1,
+            "id": "690f866a1a9023ffe1b1c096",
+            "kundali_id": "690f866a1a9023ffe1b1c096",
             "average_score": 0.823,
             "created_at": "2024-01-15T10:30:00"
         }
@@ -138,11 +138,11 @@ class PredictionDeleteResponse(BaseModel):
 
     success: bool = Field(..., description="Whether deletion was successful")
     message: str = Field(..., description="Deletion message")
-    prediction_id: int = Field(..., description="ID of deleted prediction")
+    prediction_id: str = Field(..., description="ID of deleted prediction")
 
     class Config:
         example = {
             "success": True,
             "message": "Prediction deleted successfully",
-            "prediction_id": 1
+            "prediction_id": "690f866a1a9023ffe1b1c096"
         }

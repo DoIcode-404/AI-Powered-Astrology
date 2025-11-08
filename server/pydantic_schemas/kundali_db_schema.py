@@ -53,8 +53,8 @@ class KundaliUpdateRequest(BaseModel):
 class KundaliResponse(BaseModel):
     """Response containing saved Kundali data."""
 
-    id: int = Field(..., description="Kundali ID")
-    user_id: int = Field(..., description="User ID")
+    id: str = Field(..., description="Kundali ID")
+    user_id: str = Field(..., description="User ID")
     name: str = Field(..., description="Kundali name")
     birth_date: str = Field(..., description="Birth date")
     birth_time: str = Field(..., description="Birth time")
@@ -69,8 +69,8 @@ class KundaliResponse(BaseModel):
     class Config:
         from_attributes = True
         example = {
-            "id": 1,
-            "user_id": 1,
+            "id": "690f866a1a9023ffe1b1c096",
+            "user_id": "690f866a1a9023ffe1b1c096",
             "name": "My Birth Chart",
             "birth_date": "2000-01-15",
             "birth_time": "10:30:00",
@@ -87,7 +87,7 @@ class KundaliResponse(BaseModel):
 class KundaliListResponse(BaseModel):
     """Response for listing user's Kundalis."""
 
-    id: int = Field(..., description="Kundali ID")
+    id: str = Field(..., description="Kundali ID")
     name: str = Field(..., description="Kundali name")
     birth_date: str = Field(..., description="Birth date")
     created_at: datetime = Field(..., description="Creation timestamp")
@@ -95,7 +95,7 @@ class KundaliListResponse(BaseModel):
     class Config:
         from_attributes = True
         example = {
-            "id": 1,
+            "id": "690f866a1a9023ffe1b1c096",
             "name": "My Birth Chart",
             "birth_date": "2000-01-15",
             "created_at": "2024-01-15T10:30:00"
@@ -107,11 +107,11 @@ class KundaliDeleteResponse(BaseModel):
 
     success: bool = Field(..., description="Whether deletion was successful")
     message: str = Field(..., description="Deletion message")
-    kundali_id: int = Field(..., description="ID of deleted Kundali")
+    kundali_id: str = Field(..., description="ID of deleted Kundali")
 
     class Config:
         example = {
             "success": True,
             "message": "Kundali deleted successfully",
-            "kundali_id": 1
+            "kundali_id": "690f866a1a9023ffe1b1c096"
         }

@@ -70,7 +70,7 @@ class TokenResponse(BaseModel):
 class UserResponse(BaseModel):
     """User data response (safe to send to client)."""
 
-    id: int
+    id: str
     email: str
     username: str
     full_name: Optional[str]
@@ -82,7 +82,7 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
         example = {
-            "id": 1,
+            "id": "690f866a1a9023ffe1b1c096",
             "email": "user@example.com",
             "username": "johnsmith",
             "full_name": "John Smith",
