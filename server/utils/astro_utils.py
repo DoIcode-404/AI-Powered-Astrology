@@ -608,6 +608,8 @@ def calculate_planet_positions(jd, lat=None, lon=None):
     """
     Calculate accurate sidereal positions for all planets with enhanced precision and error handling.
     """
+    import swisseph  # Lazy import to avoid import-time failures
+
     try:
         # Set sidereal mode to Lahiri (most commonly used in Vedic astrology)
         swisseph.set_sid_mode(swisseph.SIDM_LAHIRI)
@@ -731,13 +733,15 @@ def calculate_ascendant(jd, lat, lon):
     """
     Calculate the sidereal ascendant with enhanced precision and validation.
     """
+    import swisseph  # Lazy import to avoid import-time failures
+
     try:
         # Validate coordinates
         if not (-90 <= lat <= 90):
             raise ValueError(f"Invalid latitude: {lat}. Must be between -90 and 90.")
         if not (-180 <= lon <= 180):
             raise ValueError(f"Invalid longitude: {lon}. Must be between -180 and 180.")
-        
+
         # Set sidereal mode consistently
         swisseph.set_sid_mode(swisseph.SIDM_LAHIRI)
         ayanamsa = swisseph.get_ayanamsa(jd)
