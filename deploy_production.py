@@ -106,9 +106,9 @@ def health_check():
 
 def start_server():
     """
-    Start gunicorn server via exec.
+    Start uvicorn ASGI server via exec.
 
-    This replaces the current Python process with gunicorn,
+    This replaces the current Python process with uvicorn,
     making it the main process that handles requests.
     """
     logger.info("=" * 60)
@@ -118,27 +118,28 @@ def start_server():
     logger.info("✓ Database setup: COMPLETED")
     logger.info("✓ Health checks: COMPLETED")
     logger.info("")
-    logger.info("Starting gunicorn web server...")
+    logger.info("Starting uvicorn ASGI web server...")
     logger.info("=" * 60)
 
     # Get port from environment (Railway sets PORT env var)
     port = os.getenv("PORT", "8000")
 
-    # Exec gunicorn - this replaces the current process
-    # Use exec so gunicorn becomes PID 1 in the container
+    # Exec uvicorn - this replaces the current process
+    # Use exec so uvicorn becomes PID 1 in the container
     import subprocess
 
     cmd = [
-        "gunicorn",
-        "-w", "4",  # 4 worker processes
-        "-b", f"0.0.0.0:{port}",  # Bind to all interfaces
-        "server.main:app"  # The FastAPI app
+        "uvicorn",
+        "server.main:app",  # The FastAPI app
+        "--host", "0.0.0.0",  # Bind to all interfaces
+        "--port", str(port),  # Port from environment
+        "--workers", "4"  # 4 worker processes
     ]
 
     logger.info(f"Executing: {' '.join(cmd)}")
 
-    # Use os.execvp to replace this process with gunicorn
-    os.execvp("gunicorn", cmd)
+    # Use os.execvp to replace this process with uvicorn
+    os.execvp("uvicorn", cmd)
 
 
 def main():
