@@ -1,4 +1,3 @@
-import swisseph as swe
 import os
 import logging
 
@@ -6,6 +5,9 @@ logger = logging.getLogger(__name__)
 
 # Set the ephemeris path
 def setup_ephemeris():
+    # Lazy import to avoid triggering libsqlite3 system library at module load time
+    import swisseph as swe
+
     ephe_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "swisseph_data"))
     if os.path.exists(ephe_path):
         swe.set_ephe_path(ephe_path)
