@@ -1,0 +1,20 @@
+# Optional ML & Data Processing Dependencies
+# These are NOT required for production deployment
+# Use only for local development of ML features
+# Install with: pip install -r requirements-ml.txt
+
+# Include all production dependencies
+-r requirements.txt
+
+# ML & Data Processing
+numpy>=1.26.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+joblib>=1.3.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-timeout>=2.2.0
