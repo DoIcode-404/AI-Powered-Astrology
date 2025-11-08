@@ -106,10 +106,10 @@ def health_check():
 
 def start_server():
     """
-    Placeholder for server startup.
+    Start gunicorn server via exec.
 
-    NOTE: In production, gunicorn (via Procfile) handles actual server startup.
-    This function is kept for backward compatibility only.
+    This replaces the current Python process with gunicorn,
+    making it the main process that handles requests.
     """
     logger.info("=" * 60)
     logger.info("Startup Script Completed")
@@ -118,9 +118,27 @@ def start_server():
     logger.info("✓ Database setup: COMPLETED")
     logger.info("✓ Health checks: COMPLETED")
     logger.info("")
-    logger.info("Gunicorn will now start via Procfile...")
-    logger.info("Web server will listen on 0.0.0.0:$PORT")
+    logger.info("Starting gunicorn web server...")
     logger.info("=" * 60)
+
+    # Get port from environment (Railway sets PORT env var)
+    port = os.getenv("PORT", "8000")
+
+    # Exec gunicorn - this replaces the current process
+    # Use exec so gunicorn becomes PID 1 in the container
+    import subprocess
+
+    cmd = [
+        "gunicorn",
+        "-w", "4",  # 4 worker processes
+        "-b", f"0.0.0.0:{port}",  # Bind to all interfaces
+        "server.main:app"  # The FastAPI app
+    ]
+
+    logger.info(f"Executing: {' '.join(cmd)}")
+
+    # Use os.execvp to replace this process with gunicorn
+    os.execvp("gunicorn", cmd)
 
 
 def main():
@@ -142,15 +160,11 @@ def main():
     logger.info("")
     health_check()
 
-    # Step 4: Complete and exit
+    # Step 4: Start gunicorn web server
     logger.info("")
     start_server()
-
-    # Exit successfully - gunicorn will be started via Procfile
-    logger.info("")
-    logger.info("Deployment script completed successfully")
-    logger.info("Exiting to allow Procfile to start gunicorn...")
-    sys.exit(0)
+    # Note: start_server() uses os.execvp, so execution never reaches here
+    # The process is replaced by gunicorn
 
 
 if __name__ == "__main__":
