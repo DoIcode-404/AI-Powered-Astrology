@@ -22,8 +22,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Setup ephemeris
-setup_ephemeris()  # Ensure the ephemeris path is set correctly
+
+# Startup event to initialize ephemeris (lazy initialization)
+@app.on_event("startup")
+async def startup_event():
+    """Initialize ephemeris on app startup, not at import time."""
+    try:
+        setup_ephemeris()
+        logger.info("Ephemeris initialized successfully on startup")
+    except Exception as e:
+        logger.warning(f"Ephemeris initialization failed (non-fatal): {e}")
+        # Don't fail startup if ephemeris fails
 
 # CORS Configuration
 ALLOWED_ORIGINS = [
