@@ -994,6 +994,8 @@ def get_julian_day_from_date(date_obj: datetime) -> float:
     Returns:
         Julian Day number as float
     """
+    import swisseph  # Lazy import to avoid import-time failures
+
     try:
         jd = swisseph.julday(
             date_obj.year,
