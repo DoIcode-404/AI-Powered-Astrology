@@ -24,6 +24,13 @@ DATABASE_URL = os.getenv(
     "postgresql://postgres:password@localhost:5432/kundali_db"
 )
 
+# Add SSL mode for better compatibility with cloud environments like Railway
+# If sslmode is not already in the URL, append it
+if "sslmode" not in DATABASE_URL:
+    # Use ? or & depending on whether there are already query params
+    separator = "&" if "?" in DATABASE_URL else "?"
+    DATABASE_URL = f"{DATABASE_URL}{separator}sslmode=require"
+
 # Initialize engine and session factory as None (lazy initialization)
 engine = None
 SessionLocal = None
