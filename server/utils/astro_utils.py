@@ -531,9 +531,11 @@
 
 from datetime import datetime
 import pytz
-import swisseph
 from server.pydantic_schemas.kundali_schema import KundaliRequest
 import logging
+
+# Note: swisseph is imported lazily in functions that use it to avoid
+# import-time dependency issues in production deployments
 
 # Configure logging for debugging
 logging.basicConfig(level=logging.DEBUG)
@@ -544,6 +546,8 @@ def get_julian_day_from_birth_details(birth_details: KundaliRequest) -> float:
     """
     Convert birth details to UTC and calculate Julian Day with enhanced precision.
     """
+    import swisseph  # Lazy import to avoid import-time failures
+
     try:
         # Parse the datetime string with better error handling
         dt = datetime.strptime(f"{birth_details.birthDate} {birth_details.birthTime}", "%Y-%m-%d %H:%M")
