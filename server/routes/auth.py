@@ -64,35 +64,31 @@ def get_current_user(
         HTTPException: If token is invalid or missing
     """
     if not authorization:
-        return error_response(
-            code="NO_TOKEN",
-            message="Authorization header required",
-            http_status=401,
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header required"
         )
 
     try:
         # Extract token from "Bearer <token>"
         scheme, token = authorization.split()
         if scheme.lower() != "bearer":
-            return error_response(
-                code="INVALID_SCHEME",
-                message="Invalid authentication scheme",
-                http_status=401,
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication scheme"
             )
     except ValueError:
-        return error_response(
-            code="INVALID_FORMAT",
-            message="Invalid authorization header format",
-            http_status=401,
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization header format"
         )
 
     # Verify token
     token_data = verify_token(token)
     if not token_data:
-        return error_response(
-            code="INVALID_TOKEN",
-            message="Invalid or expired token",
-            http_status=401,
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
         )
 
     # Get user from MongoDB
@@ -100,22 +96,22 @@ def get_current_user(
         users_collection = db['users']
         user_doc = users_collection.find_one({"_id": ObjectId(token_data.user_id)})
         if not user_doc:
-            return error_response(
-                code="USER_NOT_FOUND",
-                message="User not found",
-                http_status=404,
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
             )
 
         # Convert MongoDB document to User model
         user_doc['_id'] = str(user_doc['_id'])
         user = User(**user_doc)
         return user
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error fetching user: {e}")
-        return error_response(
-            code="USER_FETCH_ERROR",
-            message="Failed to retrieve user",
-            http_status=500,
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve user"
         )
 
 
@@ -382,9 +378,6 @@ async def get_current_profile(
         APIResponse with user profile data
     """
     try:
-        if isinstance(user, APIResponse):  # Error response from get_current_user
-            return user
-
         logger.info(f"Profile retrieved for user: {user.email}")
 
         user_response = UserResponse(
@@ -405,8 +398,7 @@ async def get_current_profile(
 
     except Exception as e:
         logger.error(f"Get profile error: {str(e)}", exc_info=True)
-        return error_response(
-            code="PROFILE_ERROR",
-            message=f"Failed to retrieve profile: {str(e)}",
-            http_status=500,
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve profile"
         )

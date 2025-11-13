@@ -10,7 +10,7 @@ Author: Backend API Team
 from fastapi import APIRouter, HTTPException
 import logging
 
-from server.pydantic_schemas.api_response import APIResponse, error_response
+from server.pydantic_schemas.api_response import APIResponse
 
 # Note: ML exporter imports removed - pandas/ML dependencies not available in production
 # ML features are only available in development with requirements-ml.txt
@@ -32,12 +32,10 @@ async def export_kundali_csv() -> APIResponse:
         APIResponse with error message (CSV export not available in production)
     """
     logger.warning("CSV export endpoint called - feature not available in production")
-    response, status_code = error_response(
-        code="FEATURE_UNAVAILABLE",
-        message="CSV export is only available in development mode. Install requirements-ml.txt for ML features.",
-        http_status=503
+    raise HTTPException(
+        status_code=503,
+        detail="CSV export is only available in development mode. Install requirements-ml.txt for ML features."
     )
-    raise HTTPException(status_code=status_code, detail=response.error.message)
 
 
 @router.post('/kundali-json', response_model=APIResponse, tags=["Export"])
@@ -49,12 +47,10 @@ async def export_kundali_json() -> APIResponse:
         APIResponse with error message (JSON export not available in production)
     """
     logger.warning("JSON export endpoint called - feature not available in production")
-    response, status_code = error_response(
-        code="FEATURE_UNAVAILABLE",
-        message="JSON export is only available in development mode. Install requirements-ml.txt for ML features.",
-        http_status=503
+    raise HTTPException(
+        status_code=503,
+        detail="JSON export is only available in development mode. Install requirements-ml.txt for ML features."
     )
-    raise HTTPException(status_code=status_code, detail=response.error.message)
 
 
 @router.post('/batch-kundali-csv', response_model=APIResponse, tags=["Export"])
@@ -66,12 +62,10 @@ async def export_batch_kundali_csv() -> APIResponse:
         APIResponse with error message (batch CSV export not available in production)
     """
     logger.warning("Batch CSV export endpoint called - feature not available in production")
-    response, status_code = error_response(
-        code="FEATURE_UNAVAILABLE",
-        message="Batch CSV export is only available in development mode. Install requirements-ml.txt for ML features.",
-        http_status=503
+    raise HTTPException(
+        status_code=503,
+        detail="Batch CSV export is only available in development mode. Install requirements-ml.txt for ML features."
     )
-    raise HTTPException(status_code=status_code, detail=response.error.message)
 
 
 @router.post('/batch-kundali-json', response_model=APIResponse, tags=["Export"])
@@ -83,9 +77,7 @@ async def export_batch_kundali_json() -> APIResponse:
         APIResponse with error message (batch JSON export not available in production)
     """
     logger.warning("Batch JSON export endpoint called - feature not available in production")
-    response, status_code = error_response(
-        code="FEATURE_UNAVAILABLE",
-        message="Batch JSON export is only available in development mode. Install requirements-ml.txt for ML features.",
-        http_status=503
+    raise HTTPException(
+        status_code=503,
+        detail="Batch JSON export is only available in development mode. Install requirements-ml.txt for ML features."
     )
-    raise HTTPException(status_code=status_code, detail=response.error.message)

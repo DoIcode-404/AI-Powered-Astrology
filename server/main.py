@@ -7,6 +7,7 @@ from server.routes import export, kundali, auth, transits, predictions, ml_predi
 from server.utils.swisseph_setup import setup_ephemeris
 from server.middleware.error_handler import setup_error_handlers, get_error_tracker
 from server.pydantic_schemas.api_response import APIResponse, ResponseStatus, success_response
+from server.database import get_db
 
 # Configure logging
 logging.basicConfig(
@@ -22,17 +23,43 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Global database client reference
+_db_client = None
+
 
 # Startup event to initialize ephemeris (lazy initialization)
 @app.on_event("startup")
 async def startup_event():
-    """Initialize ephemeris on app startup, not at import time."""
+    """Initialize ephemeris and database on app startup."""
+    global _db_client
     try:
         setup_ephemeris()
         logger.info("Ephemeris initialized successfully on startup")
     except Exception as e:
         logger.warning(f"Ephemeris initialization failed (non-fatal): {e}")
         # Don't fail startup if ephemeris fails
+
+    try:
+        # Initialize database connection
+        db = get_db()
+        if isinstance(db, dict):  # Successful connection
+            _db_client = db.get('_client') if hasattr(db, 'get') else None
+            logger.info("Database connection established on startup")
+    except Exception as e:
+        logger.warning(f"Database initialization on startup: {e}")
+
+
+# Shutdown event to cleanup resources
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Close database connections on app shutdown."""
+    global _db_client
+    try:
+        if _db_client:
+            _db_client.close()
+            logger.info("Database connection closed on shutdown")
+    except Exception as e:
+        logger.error(f"Error closing database connection: {e}")
 
 # CORS Configuration
 ALLOWED_ORIGINS = [
