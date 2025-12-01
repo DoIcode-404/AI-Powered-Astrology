@@ -123,11 +123,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
                 details={"validation_errors": errors}
             )
 
-            response, status_code = validation_error_response(errors, request_id)
-            return JSONResponse(
-                status_code=status_code,
-                content=response.model_dump(exclude_none=True)
-            )
+            return validation_error_response(errors, request_id)
 
         except ValueError as e:
             logger.warning(f"Value error in {request.url.path}: {str(e)}")
@@ -140,16 +136,11 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
                 status_code=400
             )
 
-            response, status_code = error_response(
+            return error_response(
                 code="VALUE_ERROR",
                 message=str(e),
                 request_id=request_id,
                 http_status=400
-            )
-
-            return JSONResponse(
-                status_code=status_code,
-                content=response.model_dump(exclude_none=True)
             )
 
         except Exception as e:
@@ -178,17 +169,12 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
             )
 
             # Return standardized error response
-            response, _ = error_response(
+            return error_response(
                 code=error_type,
                 message=error_message,
                 status=ResponseStatus.SERVER_ERROR,
                 request_id=request_id,
                 http_status=status_code
-            )
-
-            return JSONResponse(
-                status_code=status_code,
-                content=response.model_dump(exclude_none=True)
             )
 
     @staticmethod
