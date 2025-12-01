@@ -61,33 +61,27 @@ async def shutdown_event():
     except Exception as e:
         logger.error(f"Error closing database connection: {e}")
 
-# CORS Configuration
-ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:8080",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:8080",
-    
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # Setup error handling middleware
 setup_error_handlers(app)
 
-# Include routers
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(kundali.router, prefix="/kundali", tags=["Kundali"])
-app.include_router(predictions.router, prefix="/predictions", tags=["Predictions"])
-app.include_router(ml_predictions.router, prefix="/ml", tags=["ML Predictions"])
-app.include_router(export.router, prefix="/export", tags=["Export"])
-app.include_router(transits.router, prefix="/transits", tags=["Transits"])
+# CORS Configuration - Must be added AFTER error handler so it executes FIRST
+# TODO: Restrict to specific origins in production
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for development
+    allow_credentials=False,  # Required when using allow_origins=["*"]
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+# Include routers with /api prefix for versioning flexibility
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(kundali.router, prefix="/api/kundali", tags=["Kundali"])
+app.include_router(predictions.router, prefix="/api/predictions", tags=["Predictions"])
+app.include_router(ml_predictions.router, prefix="/api/ml", tags=["ML Predictions"])
+app.include_router(export.router, prefix="/api/export", tags=["Export"])
+app.include_router(transits.router, prefix="/api/transits", tags=["Transits"])
 
 
 # Health Check Endpoint
