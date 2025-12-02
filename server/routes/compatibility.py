@@ -26,7 +26,7 @@ from server.rule_engine.rules.compatibility_rules import (
     get_relationship_advice
 )
 from server.pydantic_schemas.api_response import APIResponse, success_response, error_response
-from server.utils.jwt_handler import verify_token, HTTPException as HTTPExc
+from server.utils.jwt_handler import verify_token
 
 logger = logging.getLogger(__name__)
 

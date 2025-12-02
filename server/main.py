@@ -9,7 +9,7 @@ from server.middleware.error_handler import setup_error_handlers, get_error_trac
 from server.pydantic_schemas.api_response import APIResponse, ResponseStatus, success_response
 from server.database import get_db
 from server.background_jobs import start_horoscope_scheduler, stop_horoscope_scheduler
-from server.database.indexes import create_all_indexes
+from server.database_indexes import create_all_indexes
 
 # Configure logging
 logging.basicConfig(
