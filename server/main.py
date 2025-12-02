@@ -60,8 +60,9 @@ async def startup_event():
 
     try:
         # Create database indexes for optimal performance
-        create_all_indexes()
-        logger.info("Database indexes created/verified on startup")
+        # NOTE: Temporarily disabled on Railway - can hang during startup
+        # create_all_indexes()
+        logger.info("Database index creation disabled for this deployment")
     except Exception as e:
         logger.warning(f"Database index creation failed (non-fatal): {e}")
 

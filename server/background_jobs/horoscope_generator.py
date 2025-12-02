@@ -4,7 +4,7 @@ Automatically generates and caches daily horoscopes for all zodiac signs using A
 """
 
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import Optional
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -16,7 +16,19 @@ logger = logging.getLogger(__name__)
 
 # Global scheduler instance
 scheduler: Optional[BackgroundScheduler] = None
-horoscope_service = HoroscopeService()
+horoscope_service: Optional[HoroscopeService] = None
+
+
+def get_horoscope_service():
+    """Lazy initialize horoscope service on first use."""
+    global horoscope_service
+    if horoscope_service is None:
+        try:
+            horoscope_service = HoroscopeService()
+        except Exception as e:
+            logger.error(f"Failed to initialize HoroscopeService: {e}")
+            raise
+    return horoscope_service
 
 
 def generate_daily_horoscopes_batch(target_date: Optional[date] = None):
@@ -39,7 +51,7 @@ def generate_daily_horoscopes_batch(target_date: Optional[date] = None):
         for sign in ZODIAC_SIGNS:
             try:
                 # Generate daily horoscope
-                horoscope_data = horoscope_service.generate_daily_horoscope(
+                horoscope_data = get_horoscope_service().generate_daily_horoscope(
                     zodiac_sign=sign,
                     target_date=target_date
                 )
@@ -100,7 +112,7 @@ def generate_weekly_horoscopes_batch(week_start: Optional[date] = None):
         for sign in ZODIAC_SIGNS:
             try:
                 # Generate weekly horoscope
-                horoscope_data = horoscope_service.generate_weekly_horoscope(
+                horoscope_data = get_horoscope_service().generate_weekly_horoscope(
                     zodiac_sign=sign,
                     week_start=week_start
                 )
@@ -154,7 +166,7 @@ def generate_monthly_horoscopes_batch(year_month: Optional[str] = None):
         for sign in ZODIAC_SIGNS:
             try:
                 # Generate monthly horoscope
-                horoscope_data = horoscope_service.generate_monthly_horoscope(
+                horoscope_data = get_horoscope_service().generate_monthly_horoscope(
                     zodiac_sign=sign,
                     year_month=year_month
                 )
