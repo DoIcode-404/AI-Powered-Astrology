@@ -19,7 +19,6 @@ from server.services.logic import generate_kundali_logic
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix="/transits",
     tags=["transits"]
 )
 
