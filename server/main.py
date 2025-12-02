@@ -28,6 +28,8 @@ app = FastAPI(
 # Global database client reference
 _db_client = None
 
+# Force Railway rebuild - Clean deployment (Dec 2, 2025)
+
 
 # Startup event to initialize ephemeris (lazy initialization)
 @app.on_event("startup")
