@@ -44,11 +44,11 @@ async def startup_event():
         # Don't fail startup if ephemeris fails
 
     try:
-        # Initialize database connection
-        db = get_db()
-        if isinstance(db, dict):  # Successful connection
-            _db_client = db.get('_client') if hasattr(db, 'get') else None
-            logger.info("Database connection established on startup")
+        # Initialize database connection (lazy - only when needed by routes)
+        # db = get_db()
+        # if isinstance(db, dict):  # Successful connection
+        #     _db_client = db.get('_client') if hasattr(db, 'get') else None
+        logger.info("Database connection lazy - will be initialized on first request")
     except Exception as e:
         logger.warning(f"Database initialization on startup: {e}")
 
