@@ -103,3 +103,15 @@ node_modules/
 # Project specific
 client/
 server/swisseph_data/
+
+# Documentation & Guides (not part of deployment)
+*.md
+*.txt
+!README.md
+!.gitignore
+docs/
+
+# Test files (local testing only)
+test_*.py
+integration_tests.py
+*_test.py
