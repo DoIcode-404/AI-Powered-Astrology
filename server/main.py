@@ -52,8 +52,9 @@ async def startup_event():
 
     try:
         # Initialize background job scheduler for horoscope generation
-        start_horoscope_scheduler()
-        logger.info("Background horoscope scheduler started on startup")
+        # NOTE: Temporarily disabled due to Railway compatibility issues
+        # start_horoscope_scheduler()
+        logger.info("Background horoscope scheduler disabled for this deployment")
     except Exception as e:
         logger.warning(f"Background scheduler initialization failed (non-fatal): {e}")
 
