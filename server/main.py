@@ -8,6 +8,8 @@ from server.utils.swisseph_setup import setup_ephemeris
 from server.middleware.error_handler import setup_error_handlers, get_error_tracker
 from server.pydantic_schemas.api_response import APIResponse, ResponseStatus, success_response
 from server.database import get_db
+from server.background_jobs import start_horoscope_scheduler, stop_horoscope_scheduler
+from server.database.indexes import create_all_indexes
 
 # Configure logging
 logging.basicConfig(
@@ -30,7 +32,7 @@ _db_client = None
 # Startup event to initialize ephemeris (lazy initialization)
 @app.on_event("startup")
 async def startup_event():
-    """Initialize ephemeris and database on app startup."""
+    """Initialize ephemeris, database, and background jobs on app startup."""
     global _db_client
     try:
         setup_ephemeris()
@@ -48,12 +50,33 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"Database initialization on startup: {e}")
 
+    try:
+        # Initialize background job scheduler for horoscope generation
+        start_horoscope_scheduler()
+        logger.info("Background horoscope scheduler started on startup")
+    except Exception as e:
+        logger.warning(f"Background scheduler initialization failed (non-fatal): {e}")
+
+    try:
+        # Create database indexes for optimal performance
+        create_all_indexes()
+        logger.info("Database indexes created/verified on startup")
+    except Exception as e:
+        logger.warning(f"Database index creation failed (non-fatal): {e}")
+
 
 # Shutdown event to cleanup resources
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Close database connections on app shutdown."""
+    """Close database connections and stop background jobs on app shutdown."""
     global _db_client
+    try:
+        # Stop background scheduler
+        stop_horoscope_scheduler()
+        logger.info("Background horoscope scheduler stopped on shutdown")
+    except Exception as e:
+        logger.error(f"Error stopping scheduler: {e}")
+
     try:
         if _db_client:
             _db_client.close()
