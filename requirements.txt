@@ -1,0 +1,38 @@
+# Core
+fastapi==0.109.0
+uvicorn==0.27.0
+pydantic==2.7.1
+python-multipart==0.0.6
+
+# Database
+pymongo>=4.0.0
+python-dotenv==1.0.0
+
+# Authentication & Security
+python-jose==3.3.0
+passlib==1.7.4
+bcrypt==4.1.1
+PyJWT==2.10.1
+email-validator==2.1.0
+
+# Astrology Calculations
+pymeeus==0.5.11
+pytz==2024.1
+pyswisseph>=2.10
+
+# API & HTTP
+httpx==0.25.1
+requests==2.31.0
+
+# Background Jobs & Scheduling
+apscheduler>=3.10.4
+
+# Utilities
+python-json-logger==2.0.7
+
+# ML Dependencies (optional, required for ML prediction endpoints)
+joblib>=1.3.0
+xgboost>=2.0.0
+scikit-learn>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
