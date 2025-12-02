@@ -1,4 +1,8 @@
-# Environment Variables - SENSITIVE
+# Environment Variables - SENSITIVE (server-specific)
+server/.env
+server/.env.local
+server/.env.production
+server/.env.*.local
 .env
 .env.local
 .env.production
@@ -55,16 +59,16 @@ server/ml/trained_models/
 *.log
 *.pot
 *.mo
-test_results.txt
+server/tests/test_results.txt
 nul
 
 # ML & Data Files
 training_data.csv
 evaluation_results.json
 validation_report.json
-data_leakage_analysis.json
+server/data/data_leakage_analysis.json
 
-# Documentation - Generated
+# Documentation - Generated (moved to docs/)
 API_DOCUMENTATION.md
 IMPLEMENTATION_STATUS.md
 CURRENT_STATUS.md

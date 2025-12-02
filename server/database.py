@@ -24,6 +24,11 @@ MONGODB_URL = os.getenv(
     "mongodb+srv://astrology_user:password@astrology-db.0w3uft1.mongodb.net/?retryWrites=true&w=majority"
 )
 
+# Debug: Log the loaded connection URL (without password)
+if MONGODB_URL:
+    masked_url = MONGODB_URL.split("@")[0] + "@***" if "@" in MONGODB_URL else MONGODB_URL
+    logger.info(f"MongoDB URL loaded: {masked_url}")
+
 # Initialize MongoDB client and database
 client = None
 db = None
@@ -35,6 +40,13 @@ def _init_mongo():
 
     if client is None or db is None:
         try:
+            # Log connection attempt (without password)
+            if MONGODB_URL:
+                masked_url = MONGODB_URL.split("@")[0] + "@***" if "@" in MONGODB_URL else MONGODB_URL
+                logger.info(f"Attempting MongoDB connection to: {masked_url}")
+            else:
+                logger.warning("CRITICAL: MONGODB_URL environment variable is not set!")
+
             # Create MongoDB client with connection pooling
             client = MongoClient(
                 MONGODB_URL,
@@ -58,9 +70,11 @@ def _init_mongo():
             return True
         except ServerSelectionTimeoutError as e:
             logger.error(f"MongoDB connection timeout: {e}")
+            logger.error("CRITICAL: Ensure MONGODB_URL environment variable is set in Railway deployment")
             return False
         except Exception as e:
             logger.error(f"MongoDB initialization error: {e}")
+            logger.error(f"CRITICAL: MongoDB connection failed. Check if MONGODB_URL is set and MongoDB Atlas is accessible")
             return False
 
     return True
@@ -112,8 +126,9 @@ def get_db() -> dict:
     _init_mongo()
 
     if db is None:
-        logger.error("MongoDB database not initialized")
-        raise RuntimeError("Database not available")
+        error_msg = "MongoDB database not initialized. Ensure MONGODB_URL environment variable is set correctly in Railway deployment."
+        logger.error(error_msg)
+        raise RuntimeError(error_msg)
 
     return {
         'users': db['users'],

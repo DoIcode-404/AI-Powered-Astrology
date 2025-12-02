@@ -119,3 +119,51 @@ class PasswordChangeRequest(BaseModel):
             "new_password": "new_secure_password",
             "confirm_password": "new_secure_password"
         }
+
+
+class ForgotPasswordRequest(BaseModel):
+    """Request body for forgot password."""
+
+    email: EmailStr = Field(..., description="User's email address")
+
+    class Config:
+        example = {
+            "email": "user@example.com"
+        }
+
+
+class ResetPasswordRequest(BaseModel):
+    """Request body for resetting password with token."""
+
+    token: str = Field(..., description="Password reset token from email")
+    password: str = Field(..., min_length=8, description="New password (minimum 8 characters)")
+
+    class Config:
+        example = {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "password": "new_secure_password_123"
+        }
+
+
+class VerifyResetTokenRequest(BaseModel):
+    """Request body for verifying reset token."""
+
+    token: str = Field(..., description="Password reset token to verify")
+
+    class Config:
+        example = {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        }
+
+
+class VerifyResetTokenResponse(BaseModel):
+    """Response for token verification."""
+
+    valid: bool = Field(..., description="Whether the token is valid")
+    email: Optional[str] = Field(None, description="Associated email if valid")
+
+    class Config:
+        example = {
+            "valid": True,
+            "email": "user@example.com"
+        }

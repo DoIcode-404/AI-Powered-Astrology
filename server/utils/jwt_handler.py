@@ -202,3 +202,63 @@ def refresh_access_token(refresh_token: str) -> Optional[Dict[str, str]]:
         email=token_data.email,
         username=token_data.username,
     )
+
+
+# Password reset token constants
+PASSWORD_RESET_TOKEN_EXPIRE_MINUTES = 60  # 1 hour
+
+
+def create_password_reset_token(email: str) -> str:
+    """
+    Create a JWT token for password reset.
+
+    Args:
+        email: User's email address
+
+    Returns:
+        Encoded JWT reset token string
+    """
+    to_encode = {"email": email}
+    expire = datetime.utcnow() + timedelta(minutes=PASSWORD_RESET_TOKEN_EXPIRE_MINUTES)
+    
+    to_encode.update({"exp": expire, "type": "reset"})
+    
+    try:
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return encoded_jwt
+    except Exception as e:
+        logger.error(f"Error creating password reset token: {e}")
+        raise
+
+
+def verify_password_reset_token(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Verify and decode a password reset token.
+
+    Args:
+        token: Password reset token string to verify
+
+    Returns:
+        Dictionary with email if valid, None if invalid
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        # Check token type
+        if payload.get("type") != "reset":
+            logger.warning("Invalid token type for reset")
+            return None
+
+        email = payload.get("email")
+        if not email:
+            logger.warning("Missing email in reset token")
+            return None
+
+        return {"email": email}
+
+    except JWTError as e:
+        logger.error(f"JWT verification error: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Unexpected error during reset token verification: {e}")
+        return None

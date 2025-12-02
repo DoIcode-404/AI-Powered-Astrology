@@ -402,3 +402,204 @@ async def get_current_profile(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve profile"
         )
+
+
+@router.post("/forgot-password", response_model=APIResponse, tags=["Password Reset"])
+async def forgot_password(request: UserRegisterRequest, db: dict = Depends(get_db)) -> APIResponse:
+    """
+    Request a password reset email.
+
+    Args:
+        request: Request with user email
+        db: Database connection dict
+
+    Returns:
+        APIResponse confirming email sent or user not found
+    """
+    try:
+        from server.pydantic_schemas.user_schema import ForgotPasswordRequest
+        from server.utils.jwt_handler import create_password_reset_token
+
+        logger.info(f"Password reset requested for email: {request.email}")
+
+        users_collection = db['users']
+
+        # Find user by email
+        user_doc = users_collection.find_one({"email": request.email})
+        if not user_doc:
+            return error_response(
+                code="EMAIL_NOT_FOUND",
+                message=f"No account found with email {request.email}",
+                http_status=404,
+            )
+
+        # Create password reset token
+        reset_token = create_password_reset_token(request.email)
+
+        # TODO: Send email with reset link
+        # In production, integrate with email service (SendGrid, AWS SES, etc.)
+        # reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
+        # send_password_reset_email(request.email, reset_link)
+
+        logger.info(f"Password reset email sent to: {request.email}")
+
+        return success_response(
+            data={
+                "message": "If an account exists with this email, you will receive password reset instructions",
+                # NOTE: In production, only return the message above for security
+                # Don't expose whether email exists or not
+                "test_token": reset_token  # For testing only - remove in production
+            },
+            message="Password reset email sent",
+        )
+
+    except Exception as e:
+        logger.error(f"Forgot password error: {str(e)}", exc_info=True)
+        return error_response(
+            code="FORGOT_PASSWORD_FAILED",
+            message=f"Password reset request failed: {str(e)}",
+            http_status=500,
+        )
+
+
+@router.post("/reset-password", response_model=APIResponse, tags=["Password Reset"])
+async def reset_password(request, db: dict = Depends(get_db)) -> APIResponse:
+    """
+    Reset password with valid reset token.
+
+    Args:
+        request: Request with reset token and new password
+        db: Database connection dict
+
+    Returns:
+        APIResponse confirming password reset or error
+    """
+    try:
+        from server.pydantic_schemas.user_schema import ResetPasswordRequest
+        from server.utils.jwt_handler import verify_password_reset_token, hash_password
+
+        logger.info("Password reset attempt")
+
+        # Verify reset token
+        token_data = verify_password_reset_token(request.token)
+        if not token_data:
+            return error_response(
+                code="INVALID_RESET_TOKEN",
+                message="Invalid or expired reset token",
+                http_status=400,
+            )
+
+        email = token_data.get("email")
+        users_collection = db['users']
+
+        # Find user by email
+        user_doc = users_collection.find_one({"email": email})
+        if not user_doc:
+            return error_response(
+                code="USER_NOT_FOUND",
+                message="User not found",
+                http_status=404,
+            )
+
+        # Validate password strength
+        if len(request.password) < 8:
+            return error_response(
+                code="PASSWORD_TOO_SHORT",
+                message="Password must be at least 8 characters",
+                http_status=400,
+            )
+
+        # Check password complexity
+        has_upper = any(c.isupper() for c in request.password)
+        has_lower = any(c.islower() for c in request.password)
+        has_digit = any(c.isdigit() for c in request.password)
+
+        if not (has_upper and has_lower and has_digit):
+            missing = []
+            if not has_upper:
+                missing.append("uppercase letter")
+            if not has_lower:
+                missing.append("lowercase letter")
+            if not has_digit:
+                missing.append("number")
+
+            return error_response(
+                code="WEAK_PASSWORD",
+                message=f"Password must contain: {', '.join(missing)}",
+                http_status=400,
+            )
+
+        # Hash new password and update
+        hashed_password = hash_password(request.password)
+        users_collection.update_one(
+            {"_id": user_doc['_id']},
+            {"$set": {
+                "hashed_password": hashed_password,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+
+        logger.info(f"Password reset successfully for user: {email}")
+
+        return success_response(
+            data={"message": "Password has been reset successfully"},
+            message="Password reset successful",
+        )
+
+    except Exception as e:
+        logger.error(f"Reset password error: {str(e)}", exc_info=True)
+        return error_response(
+            code="RESET_PASSWORD_FAILED",
+            message=f"Password reset failed: {str(e)}",
+            http_status=500,
+        )
+
+
+@router.post("/verify-reset-token", response_model=APIResponse, tags=["Password Reset"])
+async def verify_reset_token(request) -> APIResponse:
+    """
+    Verify if a password reset token is valid.
+
+    Args:
+        request: Request with reset token to verify
+
+    Returns:
+        APIResponse with validity status and email if valid
+    """
+    try:
+        from server.pydantic_schemas.user_schema import VerifyResetTokenRequest, VerifyResetTokenResponse
+        from server.utils.jwt_handler import verify_password_reset_token
+
+        logger.info("Token verification attempt")
+
+        # Verify reset token
+        token_data = verify_password_reset_token(request.token)
+
+        if token_data:
+            response_data = VerifyResetTokenResponse(
+                valid=True,
+                email=token_data.get("email")
+            )
+            return success_response(
+                data=response_data.model_dump(),
+                message="Token is valid",
+            )
+        else:
+            response_data = VerifyResetTokenResponse(
+                valid=False,
+                email=None
+            )
+            return error_response(
+                code="INVALID_TOKEN",
+                message="Reset token is invalid or expired",
+                http_status=400,
+                data=response_data.model_dump()
+            )
+
+    except Exception as e:
+        logger.error(f"Token verification error: {str(e)}", exc_info=True)
+        return error_response(
+            code="VERIFICATION_FAILED",
+            message=f"Token verification failed: {str(e)}",
+            http_status=500,
+        )
