@@ -3,9 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from datetime import datetime
 
-# Temporarily disable new routes for Railway debugging
-from server.routes import export, kundali, auth, transits, predictions, ml_predictions
-# from server.routes import compatibility, horoscope
+from server.routes import export, kundali, auth, transits, predictions, ml_predictions, compatibility, horoscope
 from server.utils.swisseph_setup import setup_ephemeris
 from server.middleware.error_handler import setup_error_handlers, get_error_tracker
 from server.pydantic_schemas.api_response import APIResponse, ResponseStatus, success_response
@@ -80,9 +78,8 @@ app.include_router(predictions.router, prefix="/api/predictions", tags=["Predict
 app.include_router(ml_predictions.router, prefix="/api/ml", tags=["ML Predictions"])
 app.include_router(export.router, prefix="/api/export", tags=["Export"])
 app.include_router(transits.router, prefix="/api/transits", tags=["Transits"])
-# Temporarily disable new routes for Railway debugging
-# app.include_router(compatibility.router, prefix="/api/compatibility", tags=["Compatibility"])
-# app.include_router(horoscope.router, prefix="/api/predictions/horoscope", tags=["Horoscope"])
+app.include_router(compatibility.router, prefix="/api/compatibility", tags=["Compatibility"])
+app.include_router(horoscope.router, prefix="/api/predictions/horoscope", tags=["Horoscope"])
 
 
 # Health Check Endpoint
