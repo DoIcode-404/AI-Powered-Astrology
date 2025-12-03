@@ -52,19 +52,12 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"Database initialization on startup: {e}")
 
+    # Note: Background scheduler and index creation disabled on Railway to prevent startup hangs
+    # These will be run on-demand or in background tasks instead
     try:
-        # Initialize background job scheduler for horoscope generation
-        start_horoscope_scheduler()
-        logger.info("Background horoscope scheduler started on startup")
+        logger.info("Skipping background scheduler and index initialization on Railway")
     except Exception as e:
-        logger.warning(f"Background scheduler initialization failed (non-fatal): {e}")
-
-    try:
-        # Create database indexes for optimal performance
-        create_all_indexes()
-        logger.info("Database indexes created/verified on startup")
-    except Exception as e:
-        logger.warning(f"Database index creation failed (non-fatal): {e}")
+        logger.warning(f"Startup warning: {e}")
 
 
 # Shutdown event to cleanup resources
