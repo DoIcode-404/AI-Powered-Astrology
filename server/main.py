@@ -31,33 +31,11 @@ _db_client = None
 # Force Railway rebuild - Clean deployment (Dec 2, 2025) v2
 
 
-# Startup event to initialize ephemeris (lazy initialization)
+# Startup event - minimal initialization only
 @app.on_event("startup")
 async def startup_event():
-    """Initialize ephemeris, database, and background jobs on app startup."""
-    global _db_client
-    try:
-        setup_ephemeris()
-        logger.info("Ephemeris initialized successfully on startup")
-    except Exception as e:
-        logger.warning(f"Ephemeris initialization failed (non-fatal): {e}")
-        # Don't fail startup if ephemeris fails
-
-    try:
-        # Initialize database connection
-        db = get_db()
-        if isinstance(db, dict):  # Successful connection
-            _db_client = db.get('_client') if hasattr(db, 'get') else None
-            logger.info("Database connection established on startup")
-    except Exception as e:
-        logger.warning(f"Database initialization on startup: {e}")
-
-    # Note: Background scheduler and index creation disabled on Railway to prevent startup hangs
-    # These will be run on-demand or in background tasks instead
-    try:
-        logger.info("Skipping background scheduler and index initialization on Railway")
-    except Exception as e:
-        logger.warning(f"Startup warning: {e}")
+    """Minimal app startup with lazy initialization."""
+    logger.info("App startup - initialization deferred to on-demand")
 
 
 # Shutdown event to cleanup resources
