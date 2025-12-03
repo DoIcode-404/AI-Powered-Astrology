@@ -102,7 +102,6 @@ node_modules/
 
 # Project specific
 client/
-server/swisseph_data/
 
 # Documentation & Guides (not part of deployment)
 *.md
