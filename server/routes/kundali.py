@@ -236,10 +236,11 @@ async def save_kundali_chart(
             updated_at=saved_kundali['updated_at'],
         )
 
+        # success_response returns an APIResponse object, not JSONResponse
+        # so we just return the response directly without http_status parameter
         return success_response(
             data=response_data.model_dump(),
-            message="Kundali saved successfully",
-            http_status=201
+            message="Kundali saved successfully"
         )
 
     except ValueError as e:

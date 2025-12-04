@@ -16,14 +16,15 @@ class AppConfig {
   // - Physical Device or iOS Simulator: use apiBaseUrlNetworkIP
   // - Android Emulator: use apiBaseUrlAndroidEmulator
   // - Flutter Web (Chrome): use apiBaseUrlLocalhost
-  // - Railway Deployment: use apiBaseUrlRailway (CURRENT SETUP)
+  // - Railway Deployment: use apiBaseUrlRailway
   // - Production: use apiBaseUrlProduction
   static const String apiBaseUrl =
       apiBaseUrlRailway; // <-- USING RAILWAY DEPLOYMENT
 
   // Network Timeouts
+  // Increased to 120 seconds for Kundali generation (complex calculations take 30-60s)
   static const Duration connectTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 30);
+  static const Duration receiveTimeout = Duration(minutes: 2); // 120 seconds
 
   /// Get the appropriate API base URL based on environment
   /// Can be used for dynamic environment detection

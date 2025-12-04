@@ -160,10 +160,11 @@ def create_kundali_indexes():
         kundali_col = db["kundalis"]
 
         # Index 1: Index on user_id for quick user lookups
+        # Note: NOT unique - users can have multiple kundalis
         kundali_col.create_index(
             [("user_id", 1)],
             name="idx_user_kundali",
-            unique=True,
+            unique=False,
             sparse=True,
             background=True
         )
