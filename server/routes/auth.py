@@ -203,6 +203,7 @@ async def register(request: UserRegisterRequest, db: dict = Depends(get_db)) -> 
             full_name=user_doc['full_name'],
             is_active=user_doc['is_active'],
             is_verified=user_doc['is_verified'],
+            onboarding_completed=user_doc.get('onboarding_completed', False),
             created_at=user_doc['created_at'],
             last_login=user_doc['last_login'],
         )
@@ -295,6 +296,7 @@ async def login(request: UserLoginRequest, db: dict = Depends(get_db)) -> APIRes
             full_name=user_doc['full_name'],
             is_active=user_doc['is_active'],
             is_verified=user_doc['is_verified'],
+            onboarding_completed=user_doc.get('onboarding_completed', False),
             created_at=user_doc['created_at'],
             last_login=user_doc['last_login'],
         )
@@ -387,6 +389,7 @@ async def get_current_profile(
             full_name=user.full_name,
             is_active=user.is_active,
             is_verified=user.is_verified,
+            onboarding_completed=user.onboarding_completed,
             created_at=user.created_at,
             last_login=user.last_login,
         )
@@ -401,6 +404,74 @@ async def get_current_profile(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve profile"
+        )
+
+
+@router.post("/complete-onboarding", response_model=APIResponse, tags=["Onboarding"])
+async def complete_onboarding(
+    user: User = Depends(get_current_user),
+    db: dict = Depends(get_db)
+) -> APIResponse:
+    """
+    Mark onboarding as complete for the current user.
+
+    Updates the user's onboarding_completed flag to True in the database.
+
+    Requires authentication token in Authorization header.
+
+    Returns:
+        APIResponse with updated user profile data
+    """
+    try:
+        logger.info(f"Marking onboarding complete for user: {user.email}")
+
+        users_collection = db['users']
+        from bson import ObjectId
+
+        # Update user's onboarding_completed flag
+        result = users_collection.update_one(
+            {"_id": ObjectId(user.id)},
+            {"$set": {
+                "onboarding_completed": True,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+
+        if result.matched_count == 0:
+            return error_response(
+                code="USER_NOT_FOUND",
+                message="User not found",
+                http_status=404,
+            )
+
+        # Fetch updated user document
+        updated_user_doc = users_collection.find_one({"_id": ObjectId(user.id)})
+
+        user_response = UserResponse(
+            id=str(updated_user_doc['_id']),
+            email=updated_user_doc['email'],
+            username=updated_user_doc['username'],
+            full_name=updated_user_doc['full_name'],
+            is_active=updated_user_doc['is_active'],
+            is_verified=updated_user_doc['is_verified'],
+            onboarding_completed=updated_user_doc.get('onboarding_completed', True),
+            created_at=updated_user_doc['created_at'],
+            last_login=updated_user_doc['last_login'],
+        )
+
+        logger.info(f"Onboarding completed for user: {user.email}")
+
+        return success_response(
+            data=user_response.model_dump(),
+            message="Onboarding completed successfully",
+        )
+
+    except Exception as e:
+        logger.error(f"Complete onboarding error: {str(e)}", exc_info=True)
+        return error_response(
+            code="COMPLETE_ONBOARDING_FAILED",
+            message=f"Failed to complete onboarding: {str(e)}",
+            http_status=500,
         )
 
 

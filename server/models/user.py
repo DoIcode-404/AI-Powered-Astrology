@@ -22,6 +22,7 @@ class User(BaseModel):
         full_name: User's full name
         is_active: Whether account is active
         is_verified: Whether email is verified
+        onboarding_completed: Whether user has completed onboarding flow
         created_at: Account creation timestamp
         updated_at: Last update timestamp
         last_login: Last login timestamp
@@ -34,6 +35,7 @@ class User(BaseModel):
     full_name: Optional[str] = None
     is_active: bool = True
     is_verified: bool = False
+    onboarding_completed: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     last_login: Optional[datetime] = None

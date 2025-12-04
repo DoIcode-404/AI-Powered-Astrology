@@ -76,6 +76,7 @@ class UserResponse(BaseModel):
     full_name: Optional[str]
     is_active: bool
     is_verified: bool
+    onboarding_completed: bool
     created_at: datetime
     last_login: Optional[datetime]
 
@@ -88,6 +89,7 @@ class UserResponse(BaseModel):
             "full_name": "John Smith",
             "is_active": True,
             "is_verified": False,
+            "onboarding_completed": True,
             "created_at": "2024-01-15T10:30:00Z",
             "last_login": None
         }
