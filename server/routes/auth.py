@@ -407,6 +407,48 @@ async def get_current_profile(
         )
 
 
+@router.get("/profile", response_model=APIResponse, tags=["Authentication"])
+async def get_user_profile(
+    user: User = Depends(get_current_user),
+) -> APIResponse:
+    """
+    Get current authenticated user's profile.
+
+    Alias to /auth/me for backward compatibility with frontend.
+
+    Requires authentication token in Authorization header.
+
+    Returns:
+        APIResponse with user profile data
+    """
+    try:
+        logger.info(f"Profile retrieved for user: {user.email}")
+
+        user_response = UserResponse(
+            id=user.id,
+            email=user.email,
+            username=user.username,
+            full_name=user.full_name,
+            is_active=user.is_active,
+            is_verified=user.is_verified,
+            onboarding_completed=user.onboarding_completed,
+            created_at=user.created_at,
+            last_login=user.last_login,
+        )
+
+        return success_response(
+            data=user_response.model_dump(),
+            message="Profile retrieved successfully",
+        )
+
+    except Exception as e:
+        logger.error(f"Get profile error: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve profile"
+        )
+
+
 @router.post("/complete-onboarding", response_model=APIResponse, tags=["Onboarding"])
 async def complete_onboarding(
     user: User = Depends(get_current_user),
