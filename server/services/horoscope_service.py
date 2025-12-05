@@ -251,6 +251,11 @@ class HoroscopeService:
         # Aggregate life area scores
         weekly_life_areas = self._aggregate_weekly_life_areas(zodiac_sign, week_start)
 
+        # Generate category-specific predictions
+        weekly_predictions = self._generate_period_predictions(
+            zodiac_sign, weekly_life_areas, HoroscopeType.WEEKLY
+        )
+
         return {
             "horoscope_type": HoroscopeType.WEEKLY.value,
             "zodiac_sign": zodiac_sign,
@@ -267,6 +272,9 @@ class HoroscopeService:
 
             # Weekly aggregates
             "life_areas": weekly_life_areas,
+
+            # Detailed predictions by category
+            "predictions": weekly_predictions,
 
             # Forecast
             "week_forecast": weekly_forecast,
@@ -347,6 +355,11 @@ class HoroscopeService:
         # Aggregate life areas
         monthly_life_areas = self._aggregate_monthly_life_areas(zodiac_sign, month_start)
 
+        # Generate category-specific predictions
+        monthly_predictions = self._generate_period_predictions(
+            zodiac_sign, monthly_life_areas, HoroscopeType.MONTHLY
+        )
+
         return {
             "horoscope_type": HoroscopeType.MONTHLY.value,
             "zodiac_sign": zodiac_sign,
@@ -363,6 +376,9 @@ class HoroscopeService:
 
             # Life areas
             "life_areas": monthly_life_areas,
+
+            # Detailed predictions by category
+            "predictions": monthly_predictions,
 
             # Key dates
             "key_dates": key_dates,
@@ -503,7 +519,34 @@ class HoroscopeService:
     def _generate_area_prediction(self, area: str, score: float, zodiac_sign: str, horo_type: HoroscopeType) -> str:
         """Generate detailed prediction for life area"""
         ruling_planet = RULING_PLANETS.get(zodiac_sign, "Moon")
+        period = "day" if horo_type == HoroscopeType.DAILY else ("week" if horo_type == HoroscopeType.WEEKLY else "month")
 
+        # Category-specific predictions based on area and score
+        if area == "love":
+            if score >= 75:
+                return f"Romance flourishes this {period}. Emotional connections deepen, and {ruling_planet}'s influence brings warmth to relationships. Singles may encounter meaningful connections. Express your feelings openly and nurture existing bonds."
+            elif score >= 50:
+                return f"Love life shows mixed energy this {period}. While harmony is possible, communication and patience will be key. Avoid major relationship decisions. Focus on understanding your partner's perspective."
+            else:
+                return f"Relationships face challenges this {period}. Misunderstandings may arise. Practice patience and avoid confrontation. This is a time for self-reflection rather than making demands. Remember that difficulties strengthen bonds."
+
+        elif area == "career":
+            if score >= 75:
+                return f"Professional success is highly favored this {period}. Your efforts gain recognition, and new opportunities may emerge. {ruling_planet}'s energy supports your ambitions. Take initiative on important projects and network actively."
+            elif score >= 50:
+                return f"Career progress is steady this {period}, though challenges may test your resolve. Stay focused on long-term goals. Collaboration and adaptability will serve you well. Avoid office politics and maintain professionalism."
+            else:
+                return f"Work challenges require careful navigation this {period}. Delays or obstacles may appear. Use this time to refine your skills and strengthen your foundation. Avoid major career moves. Your perseverance will be rewarded later."
+
+        elif area == "health":
+            if score >= 75:
+                return f"Vitality and wellness are strong this {period}. Your energy levels are excellent, making this ideal for starting new fitness routines or health initiatives. {ruling_planet} supports your physical and mental well-being. Maintain your healthy habits."
+            elif score >= 50:
+                return f"Health is generally stable this {period}, though energy may fluctuate. Balance activity with adequate rest. Pay attention to stress levels and maintain regular sleep patterns. Moderate exercise and a balanced diet will keep you energized."
+            else:
+                return f"Health needs extra attention this {period}. You may feel depleted or vulnerable to minor ailments. Prioritize rest, proper nutrition, and stress management. Avoid overexertion. Listen to your body's signals and seek medical advice if needed."
+
+        # Default fallback for other areas
         if score >= 75:
             return f"This is a highly favorable period for {area}. {ruling_planet}'s influence brings opportunities and positive developments. Make the most of this auspicious time."
         elif score >= 50:
@@ -533,6 +576,31 @@ class HoroscopeService:
             }
 
         return formatted
+
+    def _generate_period_predictions(self, zodiac_sign: str, life_areas: Dict[str, Any], horo_type: HoroscopeType) -> List[Dict[str, Any]]:
+        """Generate detailed predictions for weekly/monthly periods (love, career, health focus)"""
+        predictions = []
+
+        # Focus on the three main categories that the frontend displays
+        focus_areas = ["love", "career", "health"]
+
+        for area in focus_areas:
+            if area in life_areas:
+                area_data = life_areas[area]
+                score = area_data.get("score", 50)
+                grade = area_data.get("grade", "C")
+
+                prediction = {
+                    "life_area": area,
+                    "score": score,
+                    "grade": grade,
+                    "headline": self._generate_area_headline(area, score, zodiac_sign),
+                    "detailed_prediction": self._generate_area_prediction(area, score, zodiac_sign, horo_type),
+                    "advice": self._generate_area_advice(area, score),
+                }
+                predictions.append(prediction)
+
+        return predictions
 
     def _generate_cautions(self, zodiac_sign: str, scores: Dict[str, float]) -> List[str]:
         """Generate cautions/warnings for the day"""
