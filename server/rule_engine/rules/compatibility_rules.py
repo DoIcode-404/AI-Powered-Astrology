@@ -69,7 +69,7 @@ def generate_strength_factors(compatibility_data: Dict[str, Any]) -> List[Dict[s
 
     # Extract highest scoring components
     overlay_score = compatibility_data.get("overlay_score", 0)
-    d9_score = compatibility_data.get("d9_score", 0)
+    house_score = compatibility_data.get("house_score", 0)
     aspect_score = compatibility_data.get("aspect_score", 0)
 
     if overlay_score > 70:
@@ -80,12 +80,12 @@ def generate_strength_factors(compatibility_data: Dict[str, Any]) -> List[Dict[s
             "area_of_life": "Romance & Attraction"
         })
 
-    if d9_score > 60:
+    if house_score > 60:
         factors.append({
-            "factor_name": "Excellent D9 (Navamsha) Compatibility",
-            "description": "Marriage indicators are very favorable in your divisional charts",
-            "impact_score": d9_score,
-            "area_of_life": "Marriage & Commitment"
+            "factor_name": "Excellent House Compatibility",
+            "description": "Sign and elemental harmony shows strong foundational compatibility",
+            "impact_score": house_score,
+            "area_of_life": "Daily Life & Harmony"
         })
 
     guna_score = compatibility_data.get("component_scores", {}).get("guna", {}).get("total_score", 0)
@@ -453,7 +453,7 @@ def generate_life_area_predictions(compatibility_data: Dict[str, Any], relations
 RELATIONSHIP_TYPE_ADVICE = {
     "romantic": {
         "focus_areas": ["Love and attraction", "Emotional intimacy", "Sexual chemistry", "Long-term commitment"],
-        "key_metrics": ["Venus placement", "Mars placement", "D9 compatibility", "Moon harmony"],
+        "key_metrics": ["Venus placement", "Mars placement", "Guna Milan", "Moon harmony"],
         "common_challenges": [
             "Varying love languages",
             "Different emotional needs",
