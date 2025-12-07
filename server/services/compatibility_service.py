@@ -352,40 +352,7 @@ class CompatibilityCalculator:
 
         return aspects, max(0, total_score)
 
-    # ========== METRIC 4: D9 (NAVAMSHA) COMPATIBILITY ==========
-
-    def calculate_d9_compatibility(self) -> float:
-        """
-        Calculate D9 (Navamsha) compatibility.
-        Vedic indicator of marriage potential and hidden nature.
-        """
-        score = 0
-
-        # Get D9 charts (simplified - using planet positions in D9)
-        if "divisional_charts" not in self.chart_a or "divisional_charts" not in self.chart_b:
-            return 0
-
-        # D9 Venus sign comparison (most important)
-        d9_a = self.chart_a.get("divisional_charts", {}).get("D9", {})
-        d9_b = self.chart_b.get("divisional_charts", {}).get("D9", {})
-
-        if d9_a and d9_b:
-            if "Venus" in d9_a.get("planets", {}) and "Venus" in d9_b.get("planets", {}):
-                venus_a_sign = d9_a["planets"]["Venus"].get("sign", "")
-                venus_b_sign = d9_b["planets"]["Venus"].get("sign", "")
-
-                if venus_a_sign == venus_b_sign:
-                    score += 20
-                elif self._get_element(venus_a_sign) == self._get_element(venus_b_sign):
-                    score += 15
-                else:
-                    score += 8
-
-        # D9 7th house lord comparison
-        if "houses" in d9_a and "houses" in d9_b:
-            score += 15  # Simplified for now
-
-        return min(60, score)
+    # ========== METRIC 4: D9 REMOVED - NOT USED ==========
 
     # ========== METRIC 5: GUNA MATCHING ==========
 
@@ -419,21 +386,31 @@ class CompatibilityCalculator:
         }
 
     def _calculate_varna(self) -> int:
-        """Nature harmony - 1 point max"""
-        moon_a_sign = self.chart_a["planets"].get("Moon", {}).get("sign", "")
-        moon_b_sign = self.chart_b["planets"].get("Moon", {}).get("sign", "")
+        """Nature harmony - 1 point max (nakshatra-based)"""
+        moon_a_nak = self.chart_a["planets"].get("Moon", {}).get("nakshatra", "")
+        moon_b_nak = self.chart_b["planets"].get("Moon", {}).get("nakshatra", "")
 
-        varnas = {
-            "Fire": "Brahmana",
-            "Earth": "Vaishya",
-            "Air": "Kshatriya",
-            "Water": "Shudra"
+        # Nakshatra to Varna mapping
+        varna_map = {
+            # Brahmin (spiritual/intellectual)
+            "Ashwini": "Brahmin", "Krittika": "Brahmin", "Punarvasu": "Brahmin",
+            "Pushya": "Brahmin", "Hasta": "Brahmin", "Swati": "Brahmin",
+            "Anuradha": "Brahmin", "Shravana": "Brahmin", "Revati": "Brahmin",
+            # Kshatriya (warrior/administrative)
+            "Bharani": "Kshatriya", "Rohini": "Kshatriya", "Ardra": "Kshatriya",
+            "Magha": "Kshatriya", "Purva Phalguni": "Kshatriya", "Chitra": "Kshatriya",
+            "Vishakha": "Kshatriya", "Purva Ashadha": "Kshatriya", "Dhanishta": "Kshatriya",
+            # Vaishya (merchant/business)
+            "Mrigashira": "Vaishya", "Ashlesha": "Vaishya", "Uttara Phalguni": "Vaishya",
+            "Jyeshtha": "Vaishya", "Uttara Ashadha": "Vaishya", "Shatabhisha": "Vaishya",
+            # Shudra (service/labor)
+            "Mula": "Shudra", "Purva Bhadrapada": "Shudra", "Uttara Bhadrapada": "Shudra"
         }
 
-        varna_a = varnas.get(ELEMENT_MAP.get(moon_a_sign, ""), "")
-        varna_b = varnas.get(ELEMENT_MAP.get(moon_b_sign, ""), "")
+        varna_a = varna_map.get(moon_a_nak, "")
+        varna_b = varna_map.get(moon_b_nak, "")
 
-        if varna_a == varna_b:
+        if varna_a and varna_b and varna_a == varna_b:
             return 1
         return 0
 
@@ -454,68 +431,177 @@ class CompatibilityCalculator:
         return score
 
     def _calculate_tara(self) -> int:
-        """Longevity together - 3 points max"""
-        # Simplified calculation based on nakshatra
-        score = 0
+        """Longevity together - 3 points max (nakshatra distance)"""
+        nakshatra_list = [
+            'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira',
+            'Ardra', 'Punarvasu', 'Pushya', 'Ashlesha', 'Magha',
+            'Purva Phalguni', 'Uttara Phalguni', 'Hasta', 'Chitra',
+            'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha', 'Mula',
+            'Purva Ashadha', 'Uttara Ashadha', 'Shravana',
+            'Dhanishta', 'Shatabhisha', 'Purva Bhadrapada',
+            'Uttara Bhadrapada', 'Revati'
+        ]
 
-        moon_a_nak = self.chart_a.get("ascendant", {}).get("nakshatra", "")
-        moon_b_nak = self.chart_b.get("ascendant", {}).get("nakshatra", "")
+        moon_a_nak = self.chart_a["planets"].get("Moon", {}).get("nakshatra", "")
+        moon_b_nak = self.chart_b["planets"].get("Moon", {}).get("nakshatra", "")
 
-        if moon_a_nak and moon_b_nak:
-            score = min(3, 3)  # Simplified
+        if not moon_a_nak or not moon_b_nak:
+            return 0
 
-        return score
+        try:
+            idx_a = nakshatra_list.index(moon_a_nak)
+            idx_b = nakshatra_list.index(moon_b_nak)
+
+            # Tara calculation: count from bride's nakshatra to groom's
+            tara = ((idx_b - idx_a) % 27) + 1
+
+            # Favorable taras: 1,3,5,7 (Janma, Sampat, Kshema, Sadhaka)
+            if tara in [1, 3, 5, 7, 11, 13, 15, 19, 21, 23, 25, 27]:
+                return 3
+            elif tara in [2, 4, 6, 8, 9, 12, 14, 16, 17, 18, 20, 24, 26]:
+                return 1.5
+            else:
+                return 0
+        except ValueError:
+            return 0
 
     def _calculate_yoni(self) -> int:
-        """Sexual compatibility - 4 points max"""
-        # Based on nakshatra animal symbols
-        score = 0
+        """Sexual compatibility - 4 points max (nakshatra animals)"""
+        # Nakshatra to Yoni (animal) mapping
+        yoni_map = {
+            "Ashwini": "Horse", "Shatabhisha": "Horse",
+            "Bharani": "Elephant", "Revati": "Elephant",
+            "Pushya": "Goat", "Krittika": "Goat",
+            "Rohini": "Serpent", "Mrigashira": "Serpent",
+            "Ardra": "Dog", "Mula": "Dog",
+            "Punarvasu": "Cat", "Ashlesha": "Cat",
+            "Magha": "Rat", "Purva Phalguni": "Rat",
+            "Uttara Phalguni": "Cow", "Uttara Bhadrapada": "Cow",
+            "Hasta": "Buffalo", "Swati": "Buffalo",
+            "Chitra": "Tiger", "Vishakha": "Tiger",
+            "Anuradha": "Deer", "Jyeshtha": "Deer",
+            "Purva Ashadha": "Monkey", "Shravana": "Monkey",
+            "Dhanishta": "Lion", "Purva Bhadrapada": "Lion",
+            "Uttara Ashadha": "Mongoose"
+        }
 
-        moon_a_nak = self.chart_a.get("ascendant", {}).get("nakshatra", "")
-        moon_b_nak = self.chart_b.get("ascendant", {}).get("nakshatra", "")
+        # Yoni compatibility matrix (4=best, 0=worst)
+        yoni_compat = {
+            ("Horse", "Horse"): 4, ("Elephant", "Elephant"): 4, ("Goat", "Goat"): 4,
+            ("Horse", "Elephant"): 3, ("Horse", "Goat"): 2,
+            ("Horse", "Tiger"): 1, ("Horse", "Cow"): 2,
+            ("Elephant", "Lion"): 1, ("Elephant", "Cat"): 2,
+            ("Serpent", "Mongoose"): 0, ("Cat", "Rat"): 0, ("Cat", "Dog"): 0,
+            ("Dog", "Deer"): 2, ("Dog", "Cat"): 0,
+            ("Tiger", "Deer"): 1, ("Tiger", "Cow"): 1
+        }
 
-        # Yoni compatibility matrix (simplified)
-        if moon_a_nak and moon_b_nak:
-            if moon_a_nak == moon_b_nak:
-                score = 4
-            else:
-                score = 2
+        moon_a_nak = self.chart_a["planets"].get("Moon", {}).get("nakshatra", "")
+        moon_b_nak = self.chart_b["planets"].get("Moon", {}).get("nakshatra", "")
 
+        if not moon_a_nak or not moon_b_nak:
+            return 0
+
+        yoni_a = yoni_map.get(moon_a_nak)
+        yoni_b = yoni_map.get(moon_b_nak)
+
+        if not yoni_a or not yoni_b:
+            return 2  # Default
+
+        # Same yoni = perfect
+        if yoni_a == yoni_b:
+            return 4
+
+        # Check both directions
+        score = yoni_compat.get((yoni_a, yoni_b), yoni_compat.get((yoni_b, yoni_a), 2))
         return score
 
     def _calculate_graha_maitri(self) -> int:
-        """Mental/intellectual compatibility - 5 points max"""
-        score = 0
+        """Mental/intellectual compatibility - 5 points max (nakshatra lords)"""
+        from server.services.dasha_calculator import DashaCalculator
 
-        mercury_a = self.chart_a["planets"].get("Mercury", {})
-        mercury_b = self.chart_b["planets"].get("Mercury", {})
+        moon_a_nak = self.chart_a["planets"].get("Moon", {}).get("nakshatra", "")
+        moon_b_nak = self.chart_b["planets"].get("Moon", {}).get("nakshatra", "")
 
-        if mercury_a and mercury_b:
-            merc_a_sign = mercury_a.get("sign", "")
-            merc_b_sign = mercury_b.get("sign", "")
+        if not moon_a_nak or not moon_b_nak:
+            return 0
 
-            if ELEMENT_MAP.get(merc_a_sign) == ELEMENT_MAP.get(merc_b_sign):
-                score = 5
+        # Get nakshatra lords using dasha calculator mapping
+        nakshatra_list = [
+            'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira',
+            'Ardra', 'Punarvasu', 'Pushya', 'Ashlesha', 'Magha',
+            'Purva Phalguni', 'Uttara Phalguni', 'Hasta', 'Chitra',
+            'Swati', 'Vishakha', 'Anuradha', 'Jyeshtha', 'Mula',
+            'Purva Ashadha', 'Uttara Ashadha', 'Shravana',
+            'Dhanishta', 'Shatabhisha', 'Purva Bhadrapada',
+            'Uttara Bhadrapada', 'Revati'
+        ]
+
+        try:
+            idx_a = nakshatra_list.index(moon_a_nak)
+            idx_b = nakshatra_list.index(moon_b_nak)
+
+            # Get lords (0-8 repeating pattern)
+            lord_a = DashaCalculator.DASHA_ORDER[(idx_a // 3) % 9]
+            lord_b = DashaCalculator.DASHA_ORDER[(idx_b // 3) % 9]
+
+            # Planetary friendship matrix
+            friends = {
+                "Sun": ["Moon", "Mars", "Jupiter"], "Moon": ["Sun", "Mercury"],
+                "Mars": ["Sun", "Moon", "Jupiter"], "Mercury": ["Sun", "Venus"],
+                "Jupiter": ["Sun", "Moon", "Mars"], "Venus": ["Mercury", "Saturn"],
+                "Saturn": ["Mercury", "Venus"], "Rahu": ["Venus", "Saturn"], "Ketu": ["Mars", "Jupiter"]
+            }
+
+            if lord_a == lord_b:
+                return 5
+            elif lord_b in friends.get(lord_a, []):
+                return 4
             else:
-                score = 2
-
-        return score
+                return 1
+        except ValueError:
+            return 0
 
     def _calculate_gana(self) -> int:
-        """Temperament compatibility - 6 points max"""
-        # Deva, Manushya, Rakshasa ganas based on nakshatras
-        score = 0
+        """Temperament compatibility - 6 points max (Deva/Manushya/Rakshasa)"""
+        # Nakshatra to Gana mapping
+        gana_map = {
+            # Deva (divine/spiritual)
+            "Ashwini": "Deva", "Mrigashira": "Deva", "Punarvasu": "Deva",
+            "Pushya": "Deva", "Hasta": "Deva", "Swati": "Deva",
+            "Anuradha": "Deva", "Shravana": "Deva", "Revati": "Deva",
+            # Manushya (human/balanced)
+            "Bharani": "Manushya", "Rohini": "Manushya", "Ardra": "Manushya",
+            "Purva Phalguni": "Manushya", "Uttara Phalguni": "Manushya",
+            "Purva Ashadha": "Manushya", "Uttara Ashadha": "Manushya",
+            "Purva Bhadrapada": "Manushya", "Uttara Bhadrapada": "Manushya",
+            # Rakshasa (demonic/materialistic)
+            "Krittika": "Rakshasa", "Ashlesha": "Rakshasa", "Magha": "Rakshasa",
+            "Chitra": "Rakshasa", "Vishakha": "Rakshasa", "Jyeshtha": "Rakshasa",
+            "Mula": "Rakshasa", "Dhanishta": "Rakshasa", "Shatabhisha": "Rakshasa"
+        }
 
-        # Simplified calculation
-        moon_a_nak = self.chart_a.get("ascendant", {}).get("nakshatra", "")
-        moon_b_nak = self.chart_b.get("ascendant", {}).get("nakshatra", "")
+        moon_a_nak = self.chart_a["planets"].get("Moon", {}).get("nakshatra", "")
+        moon_b_nak = self.chart_b["planets"].get("Moon", {}).get("nakshatra", "")
 
-        if moon_a_nak == moon_b_nak:
-            score = 6
-        elif moon_a_nak and moon_b_nak:
-            score = 3
+        if not moon_a_nak or not moon_b_nak:
+            return 0
 
-        return score
+        gana_a = gana_map.get(moon_a_nak)
+        gana_b = gana_map.get(moon_b_nak)
+
+        if not gana_a or not gana_b:
+            return 0
+
+        # Gana compatibility scoring
+        if gana_a == gana_b:
+            return 6
+        elif (gana_a == "Deva" and gana_b == "Manushya") or (gana_a == "Manushya" and gana_b == "Deva"):
+            return 5
+        elif (gana_a == "Manushya" and gana_b == "Rakshasa") or (gana_a == "Rakshasa" and gana_b == "Manushya"):
+            return 1
+        else:  # Deva vs Rakshasa
+            return 0
 
     def _calculate_bhakoot(self) -> int:
         """Emotional compatibility - 7 points max"""
@@ -543,22 +629,20 @@ class CompatibilityCalculator:
 
     def _calculate_nadi(self) -> int:
         """Health/genetics compatibility - 8 points max"""
-        score = 0
+        moon_a_nak = self.chart_a["planets"].get("Moon", {}).get("nakshatra", "")
+        moon_b_nak = self.chart_b["planets"].get("Moon", {}).get("nakshatra", "")
 
-        # Nadi based on nakshatra pada
-        nadi_a = self._get_nakshatra_nadi(
-            self.chart_a.get("ascendant", {}).get("nakshatra", "")
-        )
-        nadi_b = self._get_nakshatra_nadi(
-            self.chart_b.get("ascendant", {}).get("nakshatra", "")
-        )
+        nadi_a = self._get_nakshatra_nadi(moon_a_nak)
+        nadi_b = self._get_nakshatra_nadi(moon_b_nak)
 
-        if nadi_a == nadi_b:
-            score = 8
-        elif nadi_a and nadi_b:
-            score = 0  # Same nadi = genetic incompatibility
+        if not nadi_a or not nadi_b:
+            return 0
 
-        return score
+        # Different nadi = good (genetic diversity)
+        if nadi_a != nadi_b:
+            return 8
+        else:
+            return 0  # Same nadi = genetic incompatibility
 
     def _rate_guna_compatibility(self, total_score: int) -> str:
         """Rating based on total guna score"""
@@ -591,19 +675,24 @@ class CompatibilityCalculator:
             return -1
 
     def _get_nakshatra_nadi(self, nakshatra: str) -> Optional[str]:
-        """Get Nadi (Vata, Pitta, Kapha) from nakshatra"""
-        # Simplified mapping
-        vata_nakshatras = ["Ashwini", "Ardra", "Punarvasu", "Shatabhisha", "Dhanishta", "Shatvisha"]
-        pitta_nakshatras = ["Krittika", "Rohini", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitta", "Swati", "Vishakha", "Jyeshtha", "Mula", "Purva Ashadha"]
-        kapha_nakshatras = ["Mrigashirsha", "Pushya", "Ashlesha", "Pushya", "Uttara Ashadha", "Revati", "Bharani"]
+        """Get Nadi (Vata/Aadi, Pitta/Madhya, Kapha/Antya) from nakshatra"""
+        # Proper Nadi mapping (repeating pattern every 3 nakshatras)
+        nadi_map = {
+            # Aadi (Vata)
+            "Ashwini": "Aadi", "Ardra": "Aadi", "Punarvasu": "Aadi",
+            "Uttara Phalguni": "Aadi", "Hasta": "Aadi", "Jyeshtha": "Aadi",
+            "Mula": "Aadi", "Shatabhisha": "Aadi", "Purva Bhadrapada": "Aadi",
+            # Madhya (Pitta)
+            "Bharani": "Madhya", "Mrigashira": "Madhya", "Pushya": "Madhya",
+            "Purva Phalguni": "Madhya", "Chitra": "Madhya", "Anuradha": "Madhya",
+            "Purva Ashadha": "Madhya", "Dhanishta": "Madhya", "Uttara Bhadrapada": "Madhya",
+            # Antya (Kapha)
+            "Krittika": "Antya", "Rohini": "Antya", "Ashlesha": "Antya",
+            "Magha": "Antya", "Swati": "Antya", "Vishakha": "Antya",
+            "Uttara Ashadha": "Antya", "Shravana": "Antya", "Revati": "Antya"
+        }
 
-        if nakshatra in vata_nakshatras:
-            return "Vata"
-        elif nakshatra in pitta_nakshatras:
-            return "Pitta"
-        elif nakshatra in kapha_nakshatras:
-            return "Kapha"
-        return None
+        return nadi_map.get(nakshatra)
 
     def _find_planet_house(self, longitude: float, houses: Dict) -> int:
         """Find which house a planet falls into"""
@@ -640,23 +729,20 @@ class CompatibilityCalculator:
         overlays, overlay_score = self.calculate_overlay_scores()
         house_score = self.calculate_house_overlay_scores()
         aspects, aspect_score = self.calculate_aspect_scores()
-        d9_score = self.calculate_d9_compatibility()
         guna_data = self.calculate_guna_matching()
 
-        # Weighted formula
+        # Weighted formula (D9 removed, weights redistributed)
         weights = {
             "overlay": 0.30,
-            "house": 0.25,
-            "aspect": 0.20,
-            "d9": 0.15,
-            "guna": 0.10,
+            "house": 0.30,
+            "aspect": 0.25,
+            "guna": 0.15,
         }
 
         # Normalize scores to 0-100 range
         normalized_overlay = min(100, overlay_score)
         normalized_house = min(100, house_score)
         normalized_aspect = min(100, max(0, aspect_score + 50))  # Offset to 0-100
-        normalized_d9 = min(100, d9_score)
         normalized_guna = guna_data["compatibility_percentage"]
 
         # Calculate weighted final score
@@ -664,7 +750,6 @@ class CompatibilityCalculator:
             weights["overlay"] * normalized_overlay +
             weights["house"] * normalized_house +
             weights["aspect"] * normalized_aspect +
-            weights["d9"] * normalized_d9 +
             weights["guna"] * normalized_guna
         )
 
@@ -680,13 +765,11 @@ class CompatibilityCalculator:
             "overlay_score": normalized_overlay,
             "house_score": normalized_house,
             "aspect_score": normalized_aspect,
-            "d9_score": normalized_d9,
             "guna_score": normalized_guna,
             "component_scores": {
                 "overlay": overlay_score,
                 "house": house_score,
                 "aspect": aspect_score,
-                "d9": d9_score,
                 "guna": guna_data
             },
             "overlay_analysis": overlays,
@@ -696,20 +779,11 @@ class CompatibilityCalculator:
 
     def _apply_relationship_adjustments(self, score: float) -> float:
         """Apply relationship-type specific multipliers"""
-        multipliers = {
-            "romantic": {"overlay": 1.2, "d9": 1.2},
-            "business": {"house": 1.3, "aspect": 1.2},
-            "friendship": {"house": 1.2},
-            "family": {"house": 1.2, "d9": 1.0},
-        }
-
-        adjustments = multipliers.get(self.relationship_type, {})
-
-        # Simple adjustment (can be more sophisticated)
+        # Simple adjustment based on relationship type
         if self.relationship_type == "romantic":
-            score *= 1.1
+            score *= 1.05  # Slight boost for romantic compatibility
         elif self.relationship_type == "business":
-            score *= 1.05
+            score *= 1.02  # Small boost for business compatibility
 
         return score
 
