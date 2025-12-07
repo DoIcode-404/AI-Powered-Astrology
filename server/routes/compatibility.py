@@ -265,6 +265,32 @@ async def detailed_compatibility_analysis(
 
         calc_time = (datetime.utcnow() - start_time).total_seconds() * 1000
 
+        # Extract guna data
+        guna_data = result.get("component_scores", {}).get("guna", {})
+        individual_gunas = guna_data.get("individual_scores", {})
+
+        # Format guna_milan list for frontend
+        guna_milan_list = []
+        guna_descriptions = {
+            "Varna": "Spiritual compatibility and caste harmony",
+            "Vasya": "Mutual attraction and control in relationship",
+            "Tara": "Birth star compatibility and longevity",
+            "Yoni": "Sexual compatibility and intimate connection",
+            "Graha Maitri": "Mental and intellectual compatibility",
+            "Gana": "Temperament and behavioral compatibility",
+            "Bhakoot": "Emotional and love compatibility",
+            "Nadi": "Health and genetic compatibility"
+        }
+
+        for guna_name, points in individual_gunas.items():
+            guna_milan_list.append({
+                "name": guna_name,
+                "points": points,
+                "max_points": {"Varna": 1, "Vasya": 2, "Tara": 3, "Yoni": 4, "Graha Maitri": 5, "Gana": 6, "Bhakoot": 7, "Nadi": 8}.get(guna_name, 1),
+                "description": guna_descriptions.get(guna_name, ""),
+                "impact": "Very Positive" if points >= {"Varna": 1, "Vasya": 2, "Tara": 2.5, "Yoni": 3, "Graha Maitri": 4, "Gana": 5, "Bhakoot": 6, "Nadi": 8}.get(guna_name, 1) else "Positive" if points > 0 else "Challenging"
+            })
+
         # Prepare comprehensive response
         response_data = {
             "compatibility_percentage": round(result.get("compatibility_percentage", 0), 2),
@@ -278,9 +304,15 @@ async def detailed_compatibility_analysis(
                 "overlay": round(result.get("overlay_score", 0), 2),
                 "house": round(result.get("house_score", 0), 2),
                 "aspect": round(result.get("aspect_score", 0), 2),
-                "d9": round(result.get("d9_score", 0), 2),
-                "guna": round(result.get("component_scores", {}).get("guna", {}).get("compatibility_percentage", 0), 2),
+                "guna": round(guna_data.get("compatibility_percentage", 0), 2),
             },
+
+            # Guna Milan (8 gunas, not 9)
+            "guna_milan": guna_milan_list,
+            "guna_milan_total": guna_data.get("total_score", 0),
+            "guna_milan_percentage": round(guna_data.get("compatibility_percentage", 0), 2),
+            "vedha_present": False,
+            "vedha_description": None,
 
             # Detailed analysis
             "strengths": strengths,
