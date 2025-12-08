@@ -375,75 +375,70 @@ def generate_relationship_timeline(compatibility_data: Dict[str, Any]) -> Dict[s
 
 # ========== LIFE AREA PREDICTIONS ==========
 
-def generate_life_area_predictions(compatibility_data: Dict[str, Any], relationship_type: str) -> Dict[str, Any]:
+def generate_life_area_predictions(compatibility_data: Dict[str, Any], relationship_type: str) -> List[Dict[str, Any]]:
     """Generate predictions for specific life areas affected by relationship"""
     score = compatibility_data.get("compatibility_percentage", 50)
+    predictions = []
 
-    predictions = {
-        "career_impact": "",
-        "financial_impact": "",
-        "health_impact": "",
-        "children_prospects": "",
-        "spiritual_growth": "",
-    }
+    # Career
+    guna_data = compatibility_data.get("component_scores", {}).get("guna", {})
+    sun_guna = guna_data.get("individual_scores", {}).get("Varna", 0)
+    career_score = min(100, ((sun_guna / 6) * 100) if sun_guna else score)
+    predictions.append({
+        "area": "Career",
+        "score": career_score,
+        "prediction": "Mutual professional support and growth" if career_score >= 70 else "Career discussions needed",
+        "strengths": ["Supportive partner", "Shared ambitions"] if career_score >= 70 else ["Independent goals"],
+        "challenges": ["Career priority conflicts"] if career_score < 70 else [],
+        "timing": "Best period: Q1 & Q3 for joint ventures",
+        "remedies": ["Sun worship on Sundays", "Career advancement mantras", "Saturn remedies for stability"]
+    })
 
-    multiplier = score / 100
+    # Finance
+    predictions.append({
+        "area": "Finance",
+        "score": min(100, score if score >= 70 else score - 10),
+        "prediction": "Combined prosperity and wealth growth" if score >= 70 else "Financial boundaries needed",
+        "strengths": ["Joint investments", "Complementary financial strengths"] if score >= 70 else ["Separate finances better"],
+        "challenges": ["Money disputes", "Different spending habits"] if score < 70 else [],
+        "timing": "Best period: During Jupiter transits (next: Q2-Q3 2025)",
+        "remedies": ["Jupiter mantras on Thursdays", "Yellow sapphire gemstone", "Charity and giving practices"]
+    })
 
-    # Career impact
-    if relationship_type in ["romantic", "family"]:
-        if score >= 75:
-            predictions["career_impact"] = (
-                f"This relationship will likely support your career growth. Your partner's "
-                f"energy will inspire professional success and provide emotional support for ambitions."
-            )
-        else:
-            predictions["career_impact"] = (
-                f"Career may require attention. Ensure clear communication about professional "
-                f"goals to avoid misalignment and competition for time/energy."
-            )
+    # Health
+    predictions.append({
+        "area": "Health",
+        "score": min(100, score if score >= 75 else score - 8),
+        "prediction": "Positive wellness and emotional support" if score >= 75 else "Monitor stress and health practices",
+        "strengths": ["Emotional support system", "Wellness partnership"] if score >= 75 else ["Self-care important"],
+        "challenges": ["Relationship stress affecting health"] if score < 75 else [],
+        "timing": "Critical care periods: During challenging transits",
+        "remedies": ["Moon rituals on Mondays", "Health meditation practices", "Healing together activities"]
+    })
 
-    # Financial impact
-    if score >= 70:
-        predictions["financial_impact"] = (
-            "Financial prospects are favorable. Combined financial efforts may yield prosperity. "
-            "Joint investments and shared resources likely to grow."
-        )
-    else:
-        predictions["financial_impact"] = (
-            "Financial compatibility needs attention. Establish clear financial boundaries and "
-            "agreements to prevent disputes over money matters."
-        )
+    # Children
+    vasya_guna = guna_data.get("individual_scores", {}).get("Vasya", 0)
+    children_score = min(100, ((vasya_guna / 6) * 100) if vasya_guna else score)
+    predictions.append({
+        "area": "Children",
+        "score": children_score,
+        "prediction": "Healthy progeny and strong family bonds" if children_score >= 75 else "Parenting harmony needed",
+        "strengths": ["Nurturing environment", "Aligned parenting values"] if children_score >= 75 else [],
+        "challenges": ["Different parenting approaches", "Fertility concerns"] if children_score < 75 else [],
+        "timing": "Best conception period: Aligned planetary transits (consult for specific dates)",
+        "remedies": ["Jupiter and Venus rituals", "5th house strengthening practices", "Fertility blessings puja"]
+    })
 
-    # Health impact
-    if score >= 75:
-        predictions["health_impact"] = (
-            "Generally positive health indicators. Emotional support will enhance overall wellness. "
-            "However, remain attentive to each other's health needs."
-        )
-    else:
-        predictions["health_impact"] = (
-            "Monitor health carefully. Relationship stress may impact physical wellbeing. "
-            "Prioritize self-care and stress management practices."
-        )
-
-    # Children prospects
-    if score >= 70:
-        predictions["children_prospects"] = (
-            f"Favorable prospects for healthy, happy children if desired. Both partners likely to "
-            f"be nurturing parents with complementary parenting styles."
-        )
-    else:
-        predictions["children_prospects"] = (
-            "Parenting styles may differ significantly. Discuss child-rearing philosophies "
-            "and establish unified approach before having children."
-        )
-
-    # Spiritual growth
-    predictions["spiritual_growth"] = (
-        f"This relationship offers significant spiritual growth opportunity at {score}% compatibility. "
-        f"You will learn important lessons about love, patience, and human connection. "
-        f"Relationships are mirrors for spiritual evolution."
-    )
+    # Spiritual
+    predictions.append({
+        "area": "Spiritual",
+        "score": min(100, score),
+        "prediction": f"Spiritual growth and soul connection at {score}% compatibility",
+        "strengths": ["Soul recognition", "Life lessons together", "Shared spiritual path"],
+        "challenges": [],
+        "timing": "Lifelong journey with deepening connection",
+        "remedies": ["Meditation together", "Spiritual practice alignment", "Healing rituals for past karma"]
+    })
 
     return predictions
 
