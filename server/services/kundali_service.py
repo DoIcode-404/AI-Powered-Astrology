@@ -103,9 +103,16 @@ def get_kundali(db: dict, kundali_id: str, user_id: str) -> Optional[Dict[str, A
         Kundali document if found and owned by user, None otherwise
     """
     try:
+        # Validate kundali_id is a valid ObjectId
+        try:
+            object_id = ObjectId(kundali_id)
+        except Exception:
+            logger.warning(f"Invalid Kundali ID format: {kundali_id}")
+            return None
+
         kundalis_collection = db['kundalis']
         kundali = kundalis_collection.find_one({
-            "_id": ObjectId(kundali_id),
+            "_id": object_id,
             "user_id": user_id
         })
 
@@ -177,9 +184,15 @@ def update_kundali(
         ValueError: If trying to update non-existent Kundali
     """
     try:
+        # Validate kundali_id is a valid ObjectId
+        try:
+            object_id = ObjectId(kundali_id)
+        except Exception:
+            raise ValueError(f"Invalid Kundali ID format: {kundali_id}")
+
         kundalis_collection = db['kundalis']
         kundali = kundalis_collection.find_one({
-            "_id": ObjectId(kundali_id),
+            "_id": object_id,
             "user_id": user_id
         })
 
@@ -195,12 +208,12 @@ def update_kundali(
 
         # Update document
         kundalis_collection.update_one(
-            {"_id": ObjectId(kundali_id)},
+            {"_id": object_id},
             {"$set": update_data}
         )
 
         # Fetch and return updated document
-        updated_kundali = kundalis_collection.find_one({"_id": ObjectId(kundali_id)})
+        updated_kundali = kundalis_collection.find_one({"_id": object_id})
         updated_kundali['_id'] = str(updated_kundali['_id'])
 
         logger.info(f"Kundali updated: id={kundali_id}, user_id={user_id}")
@@ -227,16 +240,22 @@ def delete_kundali(db: dict, kundali_id: str, user_id: str) -> bool:
         ValueError: If trying to delete non-existent Kundali
     """
     try:
+        # Validate kundali_id is a valid ObjectId
+        try:
+            object_id = ObjectId(kundali_id)
+        except Exception:
+            raise ValueError(f"Invalid Kundali ID format: {kundali_id}")
+
         kundalis_collection = db['kundalis']
         kundali = kundalis_collection.find_one({
-            "_id": ObjectId(kundali_id),
+            "_id": object_id,
             "user_id": user_id
         })
 
         if not kundali:
             raise ValueError(f"Kundali {kundali_id} not found for user {user_id}")
 
-        kundalis_collection.delete_one({"_id": ObjectId(kundali_id)})
+        kundalis_collection.delete_one({"_id": object_id})
 
         logger.info(f"Kundali deleted: id={kundali_id}, user_id={user_id}")
         return True
