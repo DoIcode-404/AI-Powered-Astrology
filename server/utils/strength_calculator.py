@@ -29,6 +29,13 @@ class StrengthCalculator:
     Each planet can score 0-60 points across 6 strength measures.
     """
 
+    # Sign name to index mapping
+    SIGN_TO_INDEX = {
+        'Aries': 1, 'Taurus': 2, 'Gemini': 3, 'Cancer': 4,
+        'Leo': 5, 'Virgo': 6, 'Libra': 7, 'Scorpio': 8,
+        'Sagittarius': 9, 'Capricorn': 10, 'Aquarius': 11, 'Pisces': 12
+    }
+
     # Exalted positions (degrees where planets are strongest)
     EXALTATION_DEGREES = {
         'Sun': 10,      # Aries
@@ -193,7 +200,8 @@ class StrengthCalculator:
         if planet not in self.planets_info:
             return 0
 
-        planet_sign = self.planets_info[planet].get('sign')
+        planet_sign_name = self.planets_info[planet].get('sign')
+        planet_sign = self.SIGN_TO_INDEX.get(planet_sign_name, 1) if isinstance(planet_sign_name, str) else planet_sign_name
         planet_degree = self.planets_info[planet].get('longitude', 0)
 
         # Base score (0-15)

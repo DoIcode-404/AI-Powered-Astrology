@@ -124,8 +124,10 @@ async def generate_kundali_logic(birth_details: KundaliRequest) -> KundaliRespon
         # Calculate Shad Bala (Six Strength Measures) with enhancements
         shad_bala_info = None
         try:
+            # Convert PlanetDetails to dict for StrengthCalculator
+            planets_dict = {name: planet.model_dump() for name, planet in planets.items()}
             strength_calculator = StrengthCalculator(
-                planets_info=planet_positions,
+                planets_info=planets_dict,
                 ascendant_sign=ascendant.index,
                 birth_date=datetime.strptime(birth_details.birthDate, "%Y-%m-%d")
             )
