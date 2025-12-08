@@ -1134,6 +1134,30 @@ class CompatibilityCalculator:
             return "Average"
         else:
             return "Poor"
+        
+
+    def _interpret_guna_scores(self, gunas: Dict[str, float], total_score: float) -> Dict[str, str]:
+        """Provide interpretations for each Guna score"""
+        interpretations = {}
+
+        for guna, score in gunas.items():
+            max_score = {
+                "Varna": 1, "Vasya": 2, "Tara": 3, "Yoni": 4,
+                "Graha Maitri": 5, "Gana": 6, "Bhakoot": 7, "Nadi": 8
+            }.get(guna, 0)
+
+            percentage = (score / max_score) * 100 if max_score > 0 else 0
+
+            if percentage >= 80:
+                interpretations[guna] = "Excellent"
+            elif percentage >= 60:
+                interpretations[guna] = "Good"
+            elif percentage >= 40:
+                interpretations[guna] = "Moderate"
+            else:
+                interpretations[guna] = "Needs Attention"
+
+        return interpretations
 
     # ========== HELPER METHODS ==========
 
