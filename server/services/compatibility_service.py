@@ -416,19 +416,31 @@ class CompatibilityCalculator:
 
     def _calculate_vasya(self) -> int:
         """Physical/sexual attraction - 2 points max"""
-        score = 0
+        vasya_map = {
+            "Aries": ["Leo", "Scorpio"], "Taurus": ["Cancer", "Libra"],
+            "Gemini": ["Virgo"], "Cancer": ["Scorpio", "Sagittarius"],
+            "Leo": ["Libra"], "Virgo": ["Gemini", "Pisces"],
+            "Libra": ["Capricorn", "Virgo"], "Scorpio": ["Cancer"],
+            "Sagittarius": ["Pisces"], "Capricorn": ["Aries", "Aquarius"],
+            "Aquarius": ["Aries"], "Pisces": ["Capricorn"]
+        }
+
         moon_a_sign = self.chart_a["planets"].get("Moon", {}).get("sign", "")
         moon_b_sign = self.chart_b["planets"].get("Moon", {}).get("sign", "")
 
-        # Vasya compatibility based on zodiac
-        if ELEMENT_MAP.get(moon_a_sign) == ELEMENT_MAP.get(moon_b_sign):
-            score = 2
-        elif {ELEMENT_MAP.get(moon_a_sign), ELEMENT_MAP.get(moon_b_sign)} in [
-            {"Fire", "Air"}, {"Earth", "Water"}
-        ]:
-            score = 1
+        if not moon_a_sign or not moon_b_sign:
+            return 0
 
-        return score
+        if moon_a_sign == moon_b_sign:
+            return 2
+
+        if moon_b_sign in vasya_map.get(moon_a_sign, []) or moon_a_sign in vasya_map.get(moon_b_sign, []):
+            return 2
+
+        if ELEMENT_MAP.get(moon_a_sign) == ELEMENT_MAP.get(moon_b_sign):
+            return 1
+
+        return 0.5
 
     def _calculate_tara(self) -> int:
         """Longevity together - 3 points max (nakshatra distance)"""
@@ -454,10 +466,10 @@ class CompatibilityCalculator:
 
             tara = ((idx_b - idx_a) % 27) + 1
 
-            if tara in [1, 3, 5, 7, 11, 13, 15, 19, 21, 23, 25, 27]:
+            if tara in [1, 3, 5, 7]:
                 return 3
-            elif tara in [2, 4, 6, 8, 9, 12, 14, 16, 17, 18, 20, 24, 26]:
-                return 2
+            elif tara in [2, 4, 6, 8, 9, 11, 13, 15, 17, 19, 20]:
+                return 1.5
             else:
                 return 0
         except ValueError:
@@ -483,24 +495,22 @@ class CompatibilityCalculator:
             "Uttara Ashadha": "Mongoose"
         }
 
-        # Yoni compatibility matrix (4=best, 0=worst)
         yoni_compat = {
-            ("Horse", "Horse"): 4, ("Horse", "Elephant"): 3, ("Horse", "Goat"): 2,
-            ("Horse", "Tiger"): 1, ("Horse", "Cow"): 2, ("Horse", "Mongoose"): 2,
-            ("Elephant", "Elephant"): 4, ("Elephant", "Lion"): 1, ("Elephant", "Cat"): 2,
-            ("Elephant", "Horse"): 3, ("Elephant", "Goat"): 1,
-            ("Goat", "Goat"): 4, ("Goat", "Horse"): 2, ("Goat", "Elephant"): 1,
-            ("Goat", "Serpent"): 2, ("Goat", "Tiger"): 0,
-            ("Serpent", "Serpent"): 4, ("Serpent", "Mongoose"): 0, ("Serpent", "Goat"): 2,
-            ("Dog", "Dog"): 4, ("Dog", "Deer"): 2, ("Dog", "Cat"): 0, ("Dog", "Rat"): 2,
-            ("Cat", "Cat"): 4, ("Cat", "Rat"): 0, ("Cat", "Dog"): 0, ("Cat", "Deer"): 1,
-            ("Rat", "Rat"): 4, ("Rat", "Cat"): 0, ("Rat", "Dog"): 2, ("Rat", "Elephant"): 1,
-            ("Buffalo", "Buffalo"): 4, ("Buffalo", "Tiger"): 1, ("Buffalo", "Mongoose"): 2,
-            ("Tiger", "Tiger"): 4, ("Tiger", "Deer"): 1, ("Tiger", "Cow"): 1, ("Tiger", "Goat"): 0,
-            ("Mongoose", "Mongoose"): 4, ("Mongoose", "Serpent"): 0, ("Mongoose", "Buffalo"): 2,
-            ("Deer", "Deer"): 4, ("Deer", "Dog"): 2, ("Deer", "Tiger"): 1,
-            ("Lion", "Lion"): 4, ("Lion", "Elephant"): 1,
-            ("Cow", "Cow"): 4, ("Cow", "Horse"): 2, ("Cow", "Tiger"): 1,
+            ("Horse", "Horse"): 4, ("Horse", "Mare"): 4, ("Horse", "Elephant"): 2, ("Horse", "Buffalo"): 2,
+            ("Elephant", "Elephant"): 4, ("Elephant", "Horse"): 2, ("Elephant", "Lion"): 1, ("Elephant", "Cat"): 2,
+            ("Goat", "Goat"): 4, ("Goat", "Monkey"): 3, ("Goat", "Tiger"): 0, ("Goat", "Dog"): 2,
+            ("Serpent", "Serpent"): 4, ("Serpent", "Mongoose"): 0, ("Serpent", "Cow"): 2,
+            ("Dog", "Dog"): 4, ("Dog", "Rabbit"): 2, ("Dog", "Deer"): 2, ("Dog", "Cat"): 0, ("Dog", "Goat"): 2,
+            ("Cat", "Cat"): 4, ("Cat", "Rat"): 0, ("Cat", "Dog"): 0, ("Cat", "Hare"): 2, ("Cat", "Elephant"): 2,
+            ("Rat", "Rat"): 4, ("Rat", "Cat"): 0, ("Rat", "Serpent"): 2, ("Rat", "Horse"): 2,
+            ("Cow", "Cow"): 4, ("Cow", "Bull"): 4, ("Cow", "Tiger"): 1, ("Cow", "Serpent"): 2, ("Cow", "Lion"): 1,
+            ("Buffalo", "Buffalo"): 4, ("Buffalo", "Tiger"): 1, ("Buffalo", "Horse"): 2, ("Buffalo", "Lion"): 2,
+            ("Tiger", "Tiger"): 4, ("Tiger", "Deer"): 0, ("Tiger", "Cow"): 1, ("Tiger", "Goat"): 0, ("Tiger", "Buffalo"): 1,
+            ("Hare", "Hare"): 4, ("Hare", "Cat"): 2, ("Hare", "Dog"): 1,
+            ("Monkey", "Monkey"): 4, ("Monkey", "Goat"): 3, ("Monkey", "Serpent"): 2, ("Monkey", "Lion"): 2,
+            ("Mongoose", "Mongoose"): 4, ("Mongoose", "Serpent"): 0,
+            ("Lion", "Lion"): 4, ("Lion", "Elephant"): 1, ("Lion", "Cow"): 1, ("Lion", "Monkey"): 2, ("Lion", "Buffalo"): 2,
+            ("Deer", "Deer"): 4, ("Deer", "Dog"): 2, ("Deer", "Tiger"): 0, ("Deer", "Monkey"): 2,
         }
 
         moon_a_nak = self.chart_a["planets"].get("Moon", {}).get("nakshatra", "")
@@ -519,8 +529,7 @@ class CompatibilityCalculator:
         if yoni_a == yoni_b:
             return 4
 
-        # Check both directions
-        score = yoni_compat.get((yoni_a, yoni_b), yoni_compat.get((yoni_b, yoni_a), 2))
+        score = yoni_compat.get((yoni_a, yoni_b), yoni_compat.get((yoni_b, yoni_a), 1))
         return score
 
     def _calculate_graha_maitri(self) -> int:
@@ -533,7 +542,6 @@ class CompatibilityCalculator:
         if not moon_a_nak or not moon_b_nak:
             return 0
 
-        # Get nakshatra lords using dasha calculator mapping
         nakshatra_list = [
             'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira',
             'Ardra', 'Punarvasu', 'Pushya', 'Ashlesha', 'Magha',
@@ -548,22 +556,44 @@ class CompatibilityCalculator:
             idx_a = nakshatra_list.index(moon_a_nak)
             idx_b = nakshatra_list.index(moon_b_nak)
 
-            # Get lords (0-8 repeating pattern)
             lord_a = DashaCalculator.DASHA_ORDER[(idx_a // 3) % 9]
             lord_b = DashaCalculator.DASHA_ORDER[(idx_b // 3) % 9]
 
-            # Planetary friendship matrix
             friends = {
-                "Sun": ["Moon", "Mars", "Jupiter"], "Moon": ["Sun", "Mercury"],
-                "Mars": ["Sun", "Moon", "Jupiter"], "Mercury": ["Sun", "Venus"],
-                "Jupiter": ["Sun", "Moon", "Mars"], "Venus": ["Mercury", "Saturn"],
-                "Saturn": ["Mercury", "Venus"], "Rahu": ["Venus", "Saturn"], "Ketu": ["Mars", "Jupiter"]
+                "Sun": ["Moon", "Mars", "Jupiter"],
+                "Moon": ["Sun", "Mercury"],
+                "Mars": ["Sun", "Moon", "Jupiter"],
+                "Mercury": ["Sun", "Venus"],
+                "Jupiter": ["Sun", "Moon", "Mars"],
+                "Venus": ["Mercury", "Saturn"],
+                "Saturn": ["Mercury", "Venus"],
+                "Rahu": ["Venus", "Saturn", "Mercury"],
+                "Ketu": ["Mars", "Jupiter"]
+            }
+
+            neutrals = {
+                "Sun": ["Mercury"], "Moon": ["Mars", "Jupiter", "Venus", "Saturn"],
+                "Mars": ["Mercury", "Venus", "Saturn"], "Mercury": ["Mars", "Jupiter", "Saturn"],
+                "Jupiter": ["Mercury", "Venus", "Saturn"], "Venus": ["Mars", "Jupiter"],
+                "Saturn": ["Mars", "Jupiter"], "Rahu": ["Jupiter"], "Ketu": ["Sun", "Moon", "Venus", "Saturn"]
+            }
+
+            enemies = {
+                "Sun": ["Venus", "Saturn", "Rahu"], "Moon": ["Rahu", "Ketu"],
+                "Mars": ["Rahu", "Ketu"], "Mercury": ["Moon", "Rahu", "Ketu"],
+                "Jupiter": ["Rahu", "Ketu"], "Venus": ["Sun", "Moon", "Rahu", "Ketu"],
+                "Saturn": ["Sun", "Moon", "Mars", "Rahu", "Ketu"], "Rahu": ["Sun", "Moon", "Mars"],
+                "Ketu": ["Mercury"]
             }
 
             if lord_a == lord_b:
                 return 5
-            elif lord_b in friends.get(lord_a, []):
+            elif lord_b in friends.get(lord_a, []) or lord_a in friends.get(lord_b, []):
                 return 4
+            elif lord_b in neutrals.get(lord_a, []) or lord_a in neutrals.get(lord_b, []):
+                return 3
+            elif lord_b in enemies.get(lord_a, []) or lord_a in enemies.get(lord_b, []):
+                return 0.5
             else:
                 return 1
         except ValueError:
@@ -623,20 +653,17 @@ class CompatibilityCalculator:
 
         if moon_a_sign_idx >= 0 and moon_b_sign_idx >= 0:
             diff = abs(moon_a_sign_idx - moon_b_sign_idx)
+            if diff > 6:
+                diff = 12 - diff
+
             if diff == 0:
-                score = 7  # Same sign
-            elif diff in [5, 7]:  # Trine (120°)
                 score = 7
-            elif diff in [1, 11]:  # Sextile (60°)
-                score = 6
-            elif diff in [4, 8]:  # Quincunx
-                score = 5
+            elif diff in [4, 5]:
+                score = 7
+            elif diff in [1, 2, 3]:
+                score = 3.5
             elif diff == 6:
-                score = 0  # Opposition (180°) - major conflict
-            elif diff in [2, 10]:  # Square adjacent
-                score = 2
-            elif diff in [3, 9]:
-                score = 4
+                score = 0
 
         return score
 
