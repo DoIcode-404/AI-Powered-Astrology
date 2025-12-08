@@ -26,6 +26,7 @@ class Kundali(BaseModel):
         timezone: Birth location timezone
         kundali_data: Complete Kundali JSON data
         ml_features: Pre-calculated ML features for ML predictions
+        is_primary: Whether this is the user's primary/default kundali (generated during signup/login)
         created_at: When this Kundali was generated
         updated_at: Last update timestamp
     """
@@ -40,6 +41,7 @@ class Kundali(BaseModel):
     timezone: str
     kundali_data: Dict[str, Any]
     ml_features: Optional[Dict[str, Any]] = None
+    is_primary: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 

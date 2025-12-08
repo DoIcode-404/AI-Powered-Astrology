@@ -63,6 +63,7 @@ class KundaliResponse(BaseModel):
     timezone: str = Field(..., description="Birth timezone")
     kundali_data: Dict[str, Any] = Field(..., description="Complete Kundali data")
     ml_features: Optional[Dict[str, float]] = Field(None, description="ML features")
+    is_primary: bool = Field(False, description="Whether this is the user's primary kundali")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
 
@@ -90,6 +91,7 @@ class KundaliListResponse(BaseModel):
     id: str = Field(..., description="Kundali ID")
     name: str = Field(..., description="Kundali name")
     birth_date: str = Field(..., description="Birth date")
+    is_primary: bool = Field(False, description="Whether this is the user's primary kundali")
     created_at: datetime = Field(..., description="Creation timestamp")
 
     class Config:

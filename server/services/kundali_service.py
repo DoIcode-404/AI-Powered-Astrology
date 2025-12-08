@@ -22,7 +22,8 @@ def save_kundali(
     longitude: str,
     timezone: str,
     kundali_data: Dict[str, Any],
-    ml_features: Optional[Dict[str, Any]] = None
+    ml_features: Optional[Dict[str, Any]] = None,
+    is_primary: bool = False
 ) -> Dict[str, Any]:
     """
     Save a new Kundali for a user.
@@ -38,6 +39,7 @@ def save_kundali(
         timezone: Birth location timezone
         kundali_data: Complete Kundali analysis data
         ml_features: Optional ML features dictionary
+        is_primary: Whether this is the user's primary kundali (default False)
 
     Returns:
         Saved Kundali document (with _id as string)
@@ -52,6 +54,14 @@ def save_kundali(
         if not user:
             raise ValueError(f"User with id {user_id} not found")
 
+        # If this is primary, unset any existing primary kundali
+        if is_primary:
+            kundalis_collection = db['kundalis']
+            kundalis_collection.update_many(
+                {"user_id": user_id, "is_primary": True},
+                {"$set": {"is_primary": False}}
+            )
+
         # Create new Kundali
         kundali_doc = {
             "user_id": user_id,
@@ -63,6 +73,7 @@ def save_kundali(
             "timezone": timezone,
             "kundali_data": kundali_data,
             "ml_features": ml_features,
+            "is_primary": is_primary,
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow(),
         }
@@ -71,7 +82,7 @@ def save_kundali(
         result = kundalis_collection.insert_one(kundali_doc)
 
         kundali_doc['_id'] = str(result.inserted_id)
-        logger.info(f"Kundali saved: id={result.inserted_id}, user_id={user_id}, name={name}")
+        logger.info(f"Kundali saved: id={result.inserted_id}, user_id={user_id}, name={name}, is_primary={is_primary}")
         return kundali_doc
 
     except Exception as e:
@@ -253,3 +264,34 @@ def get_kundali_count(db: dict, user_id: str) -> int:
     except Exception as e:
         logger.error(f"Error counting Kundalis: {str(e)}")
         return 0
+
+
+def get_primary_kundali(db: dict, user_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Get the user's primary/default kundali.
+
+    Args:
+        db: Database connection dict
+        user_id: User ID (as string)
+
+    Returns:
+        Primary Kundali document if found, None otherwise
+    """
+    try:
+        kundalis_collection = db['kundalis']
+        kundali = kundalis_collection.find_one({
+            "user_id": user_id,
+            "is_primary": True
+        })
+
+        if kundali:
+            kundali['_id'] = str(kundali['_id'])
+            logger.info(f"Retrieved primary Kundali for user {user_id}")
+        else:
+            logger.warning(f"No primary Kundali found for user {user_id}")
+
+        return kundali
+
+    except Exception as e:
+        logger.error(f"Error retrieving primary Kundali: {str(e)}")
+        raise
