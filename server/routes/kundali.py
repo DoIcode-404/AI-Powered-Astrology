@@ -32,6 +32,7 @@ from server.services.kundali_service import (
     update_kundali,
     delete_kundali,
     get_kundali_count,
+    get_primary_kundali,
 )
 from server.routes.auth import get_current_user
 from server.models.user import User
@@ -206,6 +207,11 @@ async def save_kundali_chart(
 
         logger.info(f"Saving Kundali for user: {user.email}")
 
+        # Check if this is the user's first kundali
+        kundalis_collection = db['kundalis']
+        user_kundali_count = kundalis_collection.count_documents({"user_id": user.id})
+        is_primary = user_kundali_count == 0
+
         # Save to database - MongoDB version returns dict with '_id' as string
         saved_kundali = save_kundali(
             db=db,
@@ -217,7 +223,8 @@ async def save_kundali_chart(
             longitude=request.longitude,
             timezone=request.timezone,
             kundali_data=request.kundali_data,
-            ml_features=request.ml_features
+            ml_features=request.ml_features,
+            is_primary=is_primary
         )
 
         # Convert to response schema
@@ -232,6 +239,7 @@ async def save_kundali_chart(
             timezone=saved_kundali['timezone'],
             kundali_data=saved_kundali['kundali_data'],
             ml_features=saved_kundali.get('ml_features'),
+            is_primary=saved_kundali.get('is_primary', False),
             created_at=saved_kundali['created_at'],
             updated_at=saved_kundali['updated_at'],
         )
@@ -256,6 +264,67 @@ async def save_kundali_chart(
         return error_response(
             code="SAVE_KUNDALI_ERROR",
             message=f"Failed to save Kundali: {str(e)}",
+            http_status=500
+        )
+
+
+@router.get('/primary', response_model=APIResponse, tags=["Kundali"])
+async def get_primary_kundali_endpoint(
+    user: User = Depends(get_current_user),
+    db: dict = Depends(get_db)
+) -> APIResponse:
+    """
+    Get user's primary/default Kundali (generated during signup/login).
+
+    Requires authentication token in Authorization header.
+
+    Returns:
+        APIResponse with primary Kundali data, or 404 if not found
+    """
+    try:
+        # Handle error response from get_current_user
+        if isinstance(user, APIResponse):
+            return user
+
+        logger.info(f"Retrieving primary Kundali for user: {user.email}")
+
+        # Get primary kundali from database
+        kundali = get_primary_kundali(db, user.id)
+
+        if not kundali:
+            return error_response(
+                code="PRIMARY_KUNDALI_NOT_FOUND",
+                message="No primary kundali found. Please generate your birth chart first.",
+                http_status=404
+            )
+
+        # Convert to response schema
+        response_data = KundaliResponse(
+            id=kundali['_id'],
+            user_id=kundali['user_id'],
+            name=kundali['name'],
+            birth_date=kundali['birth_date'],
+            birth_time=kundali['birth_time'],
+            latitude=float(kundali['latitude']),
+            longitude=float(kundali['longitude']),
+            timezone=kundali['timezone'],
+            kundali_data=kundali['kundali_data'],
+            ml_features=kundali.get('ml_features'),
+            is_primary=kundali.get('is_primary', True),
+            created_at=kundali['created_at'],
+            updated_at=kundali['updated_at'],
+        )
+
+        return success_response(
+            data=response_data.model_dump(),
+            message="Primary kundali retrieved successfully"
+        )
+
+    except Exception as e:
+        logger.error(f"Error retrieving primary Kundali: {str(e)}", exc_info=True)
+        return error_response(
+            code="GET_PRIMARY_KUNDALI_ERROR",
+            message=f"Failed to retrieve primary Kundali: {str(e)}",
             http_status=500
         )
 
@@ -296,6 +365,7 @@ async def list_kundalis(
                 id=k['_id'],
                 name=k['name'],
                 birth_date=k['birth_date'],
+                is_primary=k.get('is_primary', False),
                 created_at=k['created_at']
             )
             for k in kundalis
@@ -365,6 +435,7 @@ async def get_kundali_detail(
             timezone=kundali['timezone'],
             kundali_data=kundali['kundali_data'],
             ml_features=kundali.get('ml_features'),
+            is_primary=kundali.get('is_primary', False),
             created_at=kundali['created_at'],
             updated_at=kundali['updated_at'],
         )
