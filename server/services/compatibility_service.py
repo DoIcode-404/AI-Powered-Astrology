@@ -452,14 +452,12 @@ class CompatibilityCalculator:
             idx_a = nakshatra_list.index(moon_a_nak)
             idx_b = nakshatra_list.index(moon_b_nak)
 
-            # Tara calculation: count from bride's nakshatra to groom's
             tara = ((idx_b - idx_a) % 27) + 1
 
-            # Favorable taras: 1,3,5,7 (Janma, Sampat, Kshema, Sadhaka)
             if tara in [1, 3, 5, 7, 11, 13, 15, 19, 21, 23, 25, 27]:
                 return 3
             elif tara in [2, 4, 6, 8, 9, 12, 14, 16, 17, 18, 20, 24, 26]:
-                return 1.5
+                return 2
             else:
                 return 0
         except ValueError:
@@ -487,13 +485,22 @@ class CompatibilityCalculator:
 
         # Yoni compatibility matrix (4=best, 0=worst)
         yoni_compat = {
-            ("Horse", "Horse"): 4, ("Elephant", "Elephant"): 4, ("Goat", "Goat"): 4,
-            ("Horse", "Elephant"): 3, ("Horse", "Goat"): 2,
-            ("Horse", "Tiger"): 1, ("Horse", "Cow"): 2,
-            ("Elephant", "Lion"): 1, ("Elephant", "Cat"): 2,
-            ("Serpent", "Mongoose"): 0, ("Cat", "Rat"): 0, ("Cat", "Dog"): 0,
-            ("Dog", "Deer"): 2, ("Dog", "Cat"): 0,
-            ("Tiger", "Deer"): 1, ("Tiger", "Cow"): 1
+            ("Horse", "Horse"): 4, ("Horse", "Elephant"): 3, ("Horse", "Goat"): 2,
+            ("Horse", "Tiger"): 1, ("Horse", "Cow"): 2, ("Horse", "Mongoose"): 2,
+            ("Elephant", "Elephant"): 4, ("Elephant", "Lion"): 1, ("Elephant", "Cat"): 2,
+            ("Elephant", "Horse"): 3, ("Elephant", "Goat"): 1,
+            ("Goat", "Goat"): 4, ("Goat", "Horse"): 2, ("Goat", "Elephant"): 1,
+            ("Goat", "Serpent"): 2, ("Goat", "Tiger"): 0,
+            ("Serpent", "Serpent"): 4, ("Serpent", "Mongoose"): 0, ("Serpent", "Goat"): 2,
+            ("Dog", "Dog"): 4, ("Dog", "Deer"): 2, ("Dog", "Cat"): 0, ("Dog", "Rat"): 2,
+            ("Cat", "Cat"): 4, ("Cat", "Rat"): 0, ("Cat", "Dog"): 0, ("Cat", "Deer"): 1,
+            ("Rat", "Rat"): 4, ("Rat", "Cat"): 0, ("Rat", "Dog"): 2, ("Rat", "Elephant"): 1,
+            ("Buffalo", "Buffalo"): 4, ("Buffalo", "Tiger"): 1, ("Buffalo", "Mongoose"): 2,
+            ("Tiger", "Tiger"): 4, ("Tiger", "Deer"): 1, ("Tiger", "Cow"): 1, ("Tiger", "Goat"): 0,
+            ("Mongoose", "Mongoose"): 4, ("Mongoose", "Serpent"): 0, ("Mongoose", "Buffalo"): 2,
+            ("Deer", "Deer"): 4, ("Deer", "Dog"): 2, ("Deer", "Tiger"): 1,
+            ("Lion", "Lion"): 4, ("Lion", "Elephant"): 1,
+            ("Cow", "Cow"): 4, ("Cow", "Horse"): 2, ("Cow", "Tiger"): 1,
         }
 
         moon_a_nak = self.chart_a["planets"].get("Moon", {}).get("nakshatra", "")
@@ -616,13 +623,19 @@ class CompatibilityCalculator:
 
         if moon_a_sign_idx >= 0 and moon_b_sign_idx >= 0:
             diff = abs(moon_a_sign_idx - moon_b_sign_idx)
-            if diff in [0, 5, 9]:
+            if diff == 0:
+                score = 7  # Same sign
+            elif diff in [5, 7]:  # Trine (120°)
                 score = 7
-            elif diff in [1, 4, 8, 11]:
+            elif diff in [1, 11]:  # Sextile (60°)
                 score = 6
+            elif diff in [4, 8]:  # Quincunx
+                score = 5
             elif diff == 6:
-                score = 0  # Unfavorable
-            else:
+                score = 0  # Opposition (180°) - major conflict
+            elif diff in [2, 10]:  # Square adjacent
+                score = 2
+            elif diff in [3, 9]:
                 score = 4
 
         return score
@@ -638,11 +651,12 @@ class CompatibilityCalculator:
         if not nadi_a or not nadi_b:
             return 0
 
-        # Different nadi = good (genetic diversity)
         if nadi_a != nadi_b:
-            return 8
+            return 8  # Different nadi = excellent (genetic diversity)
+        elif moon_a_nak != moon_b_nak:
+            return 4  # Same nadi but different nakshatra = moderate compatibility
         else:
-            return 0  # Same nadi = genetic incompatibility
+            return 0  # Identical nadi & nakshatra = genetic incompatibility risk
 
     def _rate_guna_compatibility(self, total_score: int) -> str:
         """Rating based on total guna score"""
