@@ -80,7 +80,8 @@ class KundaliMLTrainer:
 
         # Columns to exclude from features
         self.exclude_cols = [
-            'id', 'birth_date', 'birth_time', 'location', 'is_synthetic',
+            'id', 'name', 'birth_date', 'birth_time', 'location', 'is_synthetic',
+            'latitude', 'longitude', 'timezone', 'extraction_success', 'missing_features', 'error',
             'career_potential', 'wealth_potential', 'marriage_happiness',
             'children_prospects', 'health_status', 'spiritual_inclination',
             'chart_strength', 'life_ease_score'
@@ -309,13 +310,16 @@ class KundaliMLTrainer:
         try:
             logger.info("Starting XGBoost training...")
 
-            # Create XGBoost model
+            # Create XGBoost model with regularization
             xgb_model = xgb.XGBRegressor(
-                n_estimators=200,
-                learning_rate=0.1,
-                max_depth=6,
-                subsample=0.8,
-                colsample_bytree=0.8,
+                n_estimators=50,
+                learning_rate=0.05,
+                max_depth=3,
+                subsample=0.6,
+                colsample_bytree=0.6,
+                reg_alpha=1.0,
+                reg_lambda=1.0,
+                min_child_weight=5,
                 random_state=self.random_state,
                 objective='reg:squarederror',
                 tree_method='hist',
@@ -515,7 +519,10 @@ def main():
 
     # Use absolute path
     script_dir = Path(__file__).parent
-    csv_file = script_dir / 'training_data.csv'
+
+    # Use celebrity data
+    csv_file = script_dir / 'labeled_celebrity_data.csv'
+    print(f"[INFO] Using CELEBRITY DATA: {csv_file}")
 
     trainer = KundaliMLTrainer(csv_file=str(csv_file))
     success = trainer.train_all()
