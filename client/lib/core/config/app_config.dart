@@ -1,34 +1,138 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 /// Application Configuration
 /// Centralized configuration for the entire app
 class AppConfig {
-  // API Configuration - Development URLs
-  // localhost: For Flutter Web (Chrome) or running from same machine
-  // 192.168.0.107: For physical devices on your network (RECOMMENDED)
-  // 10.0.2.2: For Android Emulator running on your computer
+  // API Configuration
+  static const int serverPort = 8000; // Your backend server port
+
+  // Fallback IPs to try in order (your most common networks)
+  static const List<String> fallbackIPs = [
+    '192.168.100.31',  // Your current network
+    '192.168.0.103',   // Your previous network
+    '192.168.1.1',     // Common router IP range
+    '10.0.0.1',        // Another common range
+  ];
 
   static const String apiBaseUrlLocalhost = 'http://127.0.0.1:8000/api';
-  static const String apiBaseUrlNetworkIP = 'http://192.168.0.107:8000/api';
   static const String apiBaseUrlAndroidEmulator = 'http://10.0.2.2:8000/api';
   static const String apiBaseUrlProduction = 'https://api.kundali-app.com/api';
-  static const String apiBaseUrlRailway = 'https://web-production-743d0.up.railway.app/api';
-
-  // CHANGE THIS based on where you're running the app:
-  // - Physical Device or iOS Simulator: use apiBaseUrlNetworkIP
-  // - Android Emulator: use apiBaseUrlAndroidEmulator
-  // - Flutter Web (Chrome): use apiBaseUrlLocalhost
-  // - Railway Deployment: use apiBaseUrlRailway
-  // - Production: use apiBaseUrlProduction
-  static const String apiBaseUrl =
-      apiBaseUrlRailway; // <-- USING RAILWAY DEPLOYMENT
+  static const String apiBaseUrlRailway =
+      'https://web-production-743d0.up.railway.app/api';
 
   // Network Timeouts
-  // Increased to 120 seconds for Kundali generation (complex calculations take 30-60s)
   static const Duration connectTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(minutes: 2); // 120 seconds
+  static const Duration receiveTimeout = Duration(minutes: 2);
 
-  /// Get the appropriate API base URL based on environment
-  /// Can be used for dynamic environment detection
-  static String getApiBaseUrl({bool isProduction = false}) {
-    return isProduction ? apiBaseUrlProduction : apiBaseUrlProduction;
+  /// Automatically detect the best API URL based on platform and network
+  static Future<String> getApiBaseUrl({bool isProduction = false}) async {
+    if (isProduction) {
+      return apiBaseUrlProduction;
+    }
+
+    // Web platform - use localhost
+    if (kIsWeb) {
+      return apiBaseUrlLocalhost;
+    }
+
+    // Android Emulator detection
+    if (Platform.isAndroid) {
+      try {
+        // Try to detect if running in emulator
+        final interfaces = await NetworkInterface.list();
+        final isEmulator = interfaces.any((interface) =>
+          interface.addresses.any((addr) => addr.address.startsWith('10.0.2'))
+        );
+        if (isEmulator) {
+          return apiBaseUrlAndroidEmulator;
+        }
+      } catch (e) {
+        print('Error detecting emulator: $e');
+      }
+    }
+
+    // Physical device - auto-detect server IP
+    return await _detectServerIP();
+  }
+
+  /// Detect server IP by scanning the local network
+  static Future<String> _detectServerIP() async {
+    try {
+      // Get device's own IP to determine network range
+      final interfaces = await NetworkInterface.list();
+
+      for (var interface in interfaces) {
+        for (var addr in interface.addresses) {
+          // Look for IPv4 addresses (not loopback)
+          if (addr.type == InternetAddressType.IPv4 && !addr.isLoopback) {
+            final deviceIP = addr.address;
+            print('Device IP: $deviceIP');
+
+            // Extract network prefix (e.g., 192.168.100 from 192.168.100.45)
+            final parts = deviceIP.split('.');
+            if (parts.length == 4) {
+              final networkPrefix = '${parts[0]}.${parts[1]}.${parts[2]}';
+
+              // Try common server IPs in the same network
+              final ipsToTry = [
+                '$networkPrefix.1',   // Router (often the dev machine)
+                '$networkPrefix.100', // Common static IP
+                '$networkPrefix.101',
+                '$networkPrefix.31',  // Your current server IP suffix
+                '$networkPrefix.103', // Your previous server IP suffix
+                ...fallbackIPs,       // Fallback to known IPs
+              ];
+
+              // Test each IP
+              for (var ip in ipsToTry) {
+                final url = 'http://$ip:$serverPort/api';
+                if (await _testConnection(url)) {
+                  print('✓ Found server at: $url');
+                  return url;
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Error during IP detection: $e');
+    }
+
+    // Final fallback - use first fallback IP
+    final fallbackUrl = 'http://${fallbackIPs.first}:$serverPort/api';
+    print('⚠ Using fallback URL: $fallbackUrl');
+    return fallbackUrl;
+  }
+
+  /// Test if server is reachable at given URL
+  static Future<bool> _testConnection(String url) async {
+    try {
+      final socket = await Socket.connect(
+        url.replaceAll('http://', '').split(':')[0],
+        serverPort,
+        timeout: Duration(milliseconds: 500),
+      );
+      socket.destroy();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Cached API URL (call getApiBaseUrl() once and cache the result)
+  static String? _cachedApiUrl;
+
+  /// Get cached API URL or detect it
+  static Future<String> get apiBaseUrl async {
+    _cachedApiUrl ??= await getApiBaseUrl();
+    return _cachedApiUrl!;
+  }
+
+  /// Force refresh the API URL (useful when switching networks)
+  static Future<String> refreshApiUrl() async {
+    _cachedApiUrl = await getApiBaseUrl();
+    return _cachedApiUrl!;
   }
 }
