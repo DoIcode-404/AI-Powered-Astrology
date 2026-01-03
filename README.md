@@ -13,6 +13,114 @@ Ever wondered what the stars have to say about you? This platform takes your bir
 - Compatibility matching using traditional Guna Milan scoring
 - AI analysis powered by Claude that explains everything in plain English
 
+## App Screenshots
+
+> **Note:** Add your app screenshots here to showcase the UI to clients
+
+### Mobile App (Flutter)
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="screenshots/splash_screen.png" width="250px" alt="Splash Screen"/>
+      <br />
+      <b>Splash Screen</b>
+    </td>
+    <td align="center">
+      <img src="screenshots/login.png" width="250px" alt="Login"/>
+      <br />
+      <b>Login Screen</b>
+    </td>
+    <td align="center">
+      <img src="screenshots/home.png" width="250px" alt="Home"/>
+      <br />
+      <b>Home Dashboard</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshots/birth_chart.png" width="250px" alt="Birth Chart"/>
+      <br />
+      <b>Kundali Birth Chart</b>
+    </td>
+    <td align="center">
+      <img src="screenshots/predictions.png" width="250px" alt="Predictions"/>
+      <br />
+      <b>AI Life Predictions</b>
+    </td>
+    <td align="center">
+      <img src="screenshots/compatibility.png" width="250px" alt="Compatibility"/>
+      <br />
+      <b>Compatibility Match</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshots/transits.png" width="250px" alt="Transits"/>
+      <br />
+      <b>Planetary Transits</b>
+    </td>
+    <td align="center">
+      <img src="screenshots/horoscope.png" width="250px" alt="Horoscope"/>
+      <br />
+      <b>Daily Horoscope</b>
+    </td>
+    <td align="center">
+      <img src="screenshots/profile.png" width="250px" alt="Profile"/>
+      <br />
+      <b>User Profile</b>
+    </td>
+  </tr>
+</table>
+
+### Web Dashboard
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="screenshots/web_dashboard.png" width="800px" alt="Web Dashboard"/>
+      <br />
+      <b>Web Dashboard View</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshots/web_chart.png" width="800px" alt="Web Chart"/>
+      <br />
+      <b>Interactive Birth Chart (Web)</b>
+    </td>
+  </tr>
+</table>
+
+### Key UI Features
+
+- **Modern Material Design 3** - Clean, intuitive interface with smooth animations
+- **Dark Mode Support** - Comfortable viewing in any lighting condition
+- **Responsive Layout** - Seamlessly adapts to phones, tablets, and web browsers
+- **Astrology-Themed Colors** - Custom color palette inspired by planets and zodiac elements
+- **Interactive Charts** - Swipe through planetary positions, tap for detailed info
+- **Offline Mode** - Access your saved charts even without internet
+
+**To add your screenshots:**
+```bash
+# Create screenshots folder in project root
+mkdir screenshots
+
+# Add your app screenshots (PNG or JPG)
+# Name them according to the table above:
+# - splash_screen.png
+# - login.png
+# - home.png
+# - birth_chart.png
+# - predictions.png
+# - compatibility.png
+# - transits.png
+# - horoscope.png
+# - profile.png
+# - web_dashboard.png
+# - web_chart.png
+```
+
 ## Tech Stack
 
 **Backend (FastAPI + Python)**

@@ -1,0 +1,1 @@
+# Screenshots Folder\n\nAdd your app screenshots here:\n\n- splash_screen.png\n- login.png\n- home.png\n- birth_chart.png\n- predictions.png\n- compatibility.png\n- transits.png\n- horoscope.png\n- profile.png\n- web_dashboard.png\n- web_chart.png
