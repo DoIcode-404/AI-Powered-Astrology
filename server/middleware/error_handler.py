@@ -26,6 +26,13 @@ from server.pydantic_schemas.api_response import (
     validation_error_response
 )
 
+try:
+    from server.pydantic_schemas.ml_response import AIAnalysisResponse
+    ML_SCHEMA_AVAILABLE = True
+except ImportError:
+    ML_SCHEMA_AVAILABLE = False
+    AIAnalysisResponse = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -82,6 +89,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
     Global error handling middleware.
 
     Catches all exceptions and returns standardized error responses.
+    Includes special handling for AI analysis endpoint schema validation.
     """
 
     async def dispatch(self, request: Request, call_next: Callable) -> JSONResponse:
@@ -100,6 +108,11 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 
         try:
             response = await call_next(request)
+
+            # Validate AI analysis response if applicable
+            if ML_SCHEMA_AVAILABLE and request.url.path == "/api/ai-analysis" and response.status_code == 200:
+                response = await self._validate_ai_analysis_response(request, response, request_id)
+
             return response
 
         except ValidationError as e:
@@ -176,6 +189,94 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
                 request_id=request_id,
                 http_status=status_code
             )
+
+    async def _validate_ai_analysis_response(
+        self,
+        request: Request,
+        response: JSONResponse,
+        request_id: str
+    ) -> JSONResponse:
+        """
+        Validate AI analysis response against schema.
+
+        Args:
+            request: HTTP request
+            response: Response to validate
+            request_id: Request tracking ID
+
+        Returns:
+            Original response if valid, error response if invalid
+        """
+        import json as json_module
+        from starlette.responses import Response
+
+        try:
+            # Get response body
+            if isinstance(response, Response):
+                response_body = b""
+                async for chunk in response.body_iterator:
+                    response_body += chunk
+
+                # Parse JSON
+                response_data = json_module.loads(response_body.decode())
+
+                # Validate against AIAnalysisResponse schema
+                try:
+                    AIAnalysisResponse(**response_data)
+                    logger.info(f"[{request_id}] AI analysis response validated successfully")
+
+                    # Return original response (reconstruct it)
+                    return JSONResponse(
+                        content=response_data,
+                        status_code=response.status_code,
+                        headers=dict(response.headers)
+                    )
+
+                except ValidationError as ve:
+                    # Schema validation failed
+                    logger.error(
+                        f"[{request_id}] AI analysis response schema validation failed"
+                    )
+                    logger.error(f"[{request_id}] Validation errors: {ve.errors()}")
+                    logger.error(f"[{request_id}] Response payload: {json_module.dumps(response_data, indent=2)}")
+
+                    # Track error
+                    error_tracker.log_error(
+                        error_code="AI_RESPONSE_SCHEMA_ERROR",
+                        message="AI analysis response failed schema validation",
+                        request_path=str(request.url.path),
+                        error_type="SchemaValidationError",
+                        status_code=500,
+                        details={
+                            "validation_errors": ve.errors(),
+                            "response_preview": str(response_data)[:500]
+                        }
+                    )
+
+                    # Return 500 error
+                    return error_response(
+                        code="SCHEMA_VALIDATION_ERROR",
+                        message="Response schema validation failed",
+                        status=ResponseStatus.SERVER_ERROR,
+                        request_id=request_id,
+                        http_status=500,
+                        details={"validation_errors": ve.errors()}
+                    )
+
+                except Exception as inner_e:
+                    logger.error(f"[{request_id}] Error validating AI response: {str(inner_e)}")
+                    # Return original response if validation process fails
+                    return JSONResponse(
+                        content=response_data,
+                        status_code=response.status_code,
+                        headers=dict(response.headers)
+                    )
+
+            return response
+
+        except Exception as e:
+            logger.warning(f"[{request_id}] Could not validate AI response: {str(e)}")
+            return response
 
     @staticmethod
     def _get_status_code_for_exception(exception: Exception) -> int:
