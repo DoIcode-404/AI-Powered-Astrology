@@ -1,0 +1,303 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "description": "MCP tools for Vedic Astrology AI Analysis",
+  "tools": [
+    {
+      "name": "get_compatibility_analysis",
+      "description": "Get AI-powered compatibility analysis between two people using their birth chart data. Returns comprehensive analysis including ML predictions, Vedic astrology scores (Guna Milan), and AI-generated insights.",
+      "target": {
+        "method": "POST",
+        "endpoint": "/api/ai-analysis",
+        "base_url": "${API_BASE_URL}"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_kundali": {
+            "type": "object",
+            "description": "User's birth chart data",
+            "properties": {
+              "birthDate": {
+                "type": "string",
+                "format": "date",
+                "description": "Birth date in YYYY-MM-DD format",
+                "example": "1990-05-15"
+              },
+              "birthTime": {
+                "type": "string",
+                "format": "time",
+                "description": "Birth time in HH:MM format (24-hour)",
+                "example": "14:30"
+              },
+              "latitude": {
+                "type": "number",
+                "description": "Latitude of birth location",
+                "minimum": -90,
+                "maximum": 90,
+                "example": 19.076
+              },
+              "longitude": {
+                "type": "number",
+                "description": "Longitude of birth location",
+                "minimum": -180,
+                "maximum": 180,
+                "example": 72.8777
+              },
+              "timezone": {
+                "type": "string",
+                "description": "IANA timezone identifier",
+                "example": "Asia/Kolkata"
+              }
+            },
+            "required": [
+              "birthDate",
+              "birthTime",
+              "latitude",
+              "longitude",
+              "timezone"
+            ]
+          },
+          "partner_kundali": {
+            "type": "object",
+            "description": "Partner's birth chart data (optional for general analysis, required for compatibility)",
+            "properties": {
+              "birthDate": {
+                "type": "string",
+                "format": "date",
+                "description": "Birth date in YYYY-MM-DD format",
+                "example": "1992-08-20"
+              },
+              "birthTime": {
+                "type": "string",
+                "format": "time",
+                "description": "Birth time in HH:MM format (24-hour)",
+                "example": "10:15"
+              },
+              "latitude": {
+                "type": "number",
+                "description": "Latitude of birth location",
+                "minimum": -90,
+                "maximum": 90,
+                "example": 28.6139
+              },
+              "longitude": {
+                "type": "number",
+                "description": "Longitude of birth location",
+                "minimum": -180,
+                "maximum": 180,
+                "example": 77.209
+              },
+              "timezone": {
+                "type": "string",
+                "description": "IANA timezone identifier",
+                "example": "Asia/Kolkata"
+              }
+            },
+            "required": [
+              "birthDate",
+              "birthTime",
+              "latitude",
+              "longitude",
+              "timezone"
+            ]
+          },
+          "context": {
+            "type": "string",
+            "enum": ["general", "compatibility", "career", "health", "wealth"],
+            "default": "compatibility",
+            "description": "Analysis context type"
+          }
+        },
+        "required": ["user_kundali"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "AI-generated summary of the analysis"
+          },
+          "detailed_insights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of detailed insights"
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Actionable recommendations"
+          },
+          "ml_scores": {
+            "type": "object",
+            "description": "ML model predictions with confidence scores",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "score": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "confidence": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "model_version": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "astrology_scores": {
+            "type": "object",
+            "description": "Deterministic Vedic astrology scores",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "response_mapping": {
+        "summary": "data.ai_analysis.summary",
+        "detailed_insights": "data.ai_analysis.detailed_insights",
+        "recommendations": "data.ai_analysis.recommendations",
+        "ml_scores": "data.ml_scores",
+        "astrology_scores": "data.astrology_scores"
+      },
+      "error_handling": {
+        "503": {
+          "message": "ML service temporarily unavailable",
+          "retry": true,
+          "retry_after": 30
+        },
+        "500": {
+          "message": "Internal server error during analysis",
+          "retry": false
+        },
+        "422": {
+          "message": "Invalid birth data provided",
+          "retry": false
+        }
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "category": "astrology",
+        "tags": [
+          "compatibility",
+          "vedic-astrology",
+          "ai-analysis",
+          "ml-predictions"
+        ],
+        "rate_limit": {
+          "requests_per_minute": 10,
+          "requests_per_hour": 100
+        },
+        "estimated_response_time_ms": 2000
+      }
+    },
+    {
+      "name": "get_personal_analysis",
+      "description": "Get AI-powered personal astrology analysis for a single person without compatibility focus. Analyzes career, wealth, health, and life prospects.",
+      "target": {
+        "method": "POST",
+        "endpoint": "/api/ai-analysis",
+        "base_url": "${API_BASE_URL}"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_kundali": {
+            "type": "object",
+            "description": "User's birth chart data",
+            "properties": {
+              "birthDate": {
+                "type": "string",
+                "format": "date",
+                "example": "1990-05-15"
+              },
+              "birthTime": {
+                "type": "string",
+                "format": "time",
+                "example": "14:30"
+              },
+              "latitude": {
+                "type": "number",
+                "example": 19.076
+              },
+              "longitude": {
+                "type": "number",
+                "example": 72.8777
+              },
+              "timezone": {
+                "type": "string",
+                "example": "Asia/Kolkata"
+              }
+            },
+            "required": [
+              "birthDate",
+              "birthTime",
+              "latitude",
+              "longitude",
+              "timezone"
+            ]
+          },
+          "context": {
+            "type": "string",
+            "enum": ["general", "career", "health", "wealth"],
+            "default": "general",
+            "description": "Analysis focus area"
+          }
+        },
+        "required": ["user_kundali"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string"
+          },
+          "detailed_insights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "response_mapping": {
+        "summary": "data.ai_analysis.summary",
+        "detailed_insights": "data.ai_analysis.detailed_insights",
+        "recommendations": "data.ai_analysis.recommendations"
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "category": "astrology",
+        "tags": ["personal-analysis", "vedic-astrology", "ai-analysis"]
+      }
+    }
+  ],
+  "authentication": {
+    "type": "bearer",
+    "token_env_var": "ASTROLOGY_API_TOKEN",
+    "optional": true
+  },
+  "configuration": {
+    "API_BASE_URL": {
+      "description": "Base URL for the astrology API",
+      "default": "http://localhost:8000",
+      "env_var": "ASTROLOGY_API_BASE_URL"
+    }
+  }
+}
