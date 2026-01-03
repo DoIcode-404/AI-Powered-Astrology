@@ -2,14 +2,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from datetime import datetime
+from dotenv import load_dotenv
 
-from server.routes import export, kundali, auth, transits, predictions, ml_predictions, compatibility, horoscope, ai_analysis
+# Load environment variables
+load_dotenv()
+
+from server.routes import export, kundali, auth, transits, predictions, ml_predictions, compatibility, horoscope, ai_analysis, batch_routes
 from server.utils.swisseph_setup import setup_ephemeris
 from server.middleware.error_handler import setup_error_handlers, get_error_tracker
 from server.pydantic_schemas.api_response import APIResponse, ResponseStatus, success_response
 from server.database import get_db
 from server.background_jobs import start_horoscope_scheduler, stop_horoscope_scheduler
 from server.database_indexes import create_all_indexes
+# from server.mcp.mcp_server import get_mcp_server
 
 # Configure logging
 logging.basicConfig(
@@ -104,6 +109,7 @@ app.include_router(transits.router, prefix="/api/transits", tags=["Transits"])
 app.include_router(compatibility.router, prefix="/api/compatibility", tags=["Compatibility"])
 app.include_router(horoscope.router, prefix="/api/predictions/horoscope", tags=["Horoscope"])
 app.include_router(ai_analysis.router, tags=["AI Analysis"])
+app.include_router(batch_routes.router, prefix="/api", tags=["Batch"])
 
 
 # Health Check Endpoint
@@ -181,5 +187,8 @@ async def error_stats():
 
 logger.info("Kundali Astrology API initialized successfully")
 
+# Initialize filtered MCP server that exposes ONLY AI analysis routes
+# mcp_server = get_mcp_server(app)
+# logger.info("Filtered MCP server initialized with route protection for LLMs")
 
 
