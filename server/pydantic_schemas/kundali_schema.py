@@ -1,14 +1,19 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Dict, List, Any, Optional, Union
 from datetime import datetime
 
 # Request Schemas
 class KundaliRequest(BaseModel):
-    birthDate: str # Format: YYYY-MM-DD
-    birthTime: str # Format: HH:MM
-    latitude: float
-    longitude: float
-    timezone: str # e.g., "UTC", "America/New_York"
+    """Birth chart request - accepts both camelCase and snake_case fields."""
+    model_config = ConfigDict(populate_by_name=True)
+    
+    birthDate: str = Field(..., alias="birth_date", description="Format: YYYY-MM-DD")
+    birthTime: str = Field(..., alias="birth_time", description="Format: HH:MM:SS")
+    latitude: float = Field(..., description="Birth latitude")
+    longitude: float = Field(..., description="Birth longitude")
+    timezone: Optional[str] = Field(default="UTC", description="e.g., UTC, America/New_York")
+    name: Optional[str] = Field(None, description="Person's name (optional)")
+    timezone_offset: Optional[float] = Field(None, description="Timezone offset in hours (optional, can be decimal like 5.5 or 5.75, overrides timezone)")
 
 
 # Response Schemas

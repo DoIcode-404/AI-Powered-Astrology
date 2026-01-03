@@ -9,7 +9,7 @@ Author: Backend AI Systems Team
 """
 
 from pydantic import BaseModel, Field, field_validator
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Optional, Any
 from datetime import datetime
 from enum import Enum
 
@@ -68,9 +68,16 @@ class AnalysisMetadata(BaseModel):
     Metadata for tracking performance and debugging.
     """
     calculation_timestamp: datetime = Field(..., description="When analysis was performed")
-    ml_inference_time_ms: float = Field(..., ge=0, description="ML inference time in milliseconds")
+    ml_inference_time_ms: Optional[float] = Field(None, ge=0, description="ML inference time in milliseconds (None if not measured)")
     astro_calc_time_ms: float = Field(..., ge=0, description="Astrology calculation time in milliseconds")
     total_time_ms: float = Field(..., ge=0, description="Total processing time in milliseconds")
+    llm_input_tokens: Optional[int] = Field(None, ge=0, description="LLM input tokens used (None if not measured)")
+    llm_output_tokens: Optional[int] = Field(None, ge=0, description="LLM output tokens used (None if not measured)")
+    llm_cost_usd: Optional[float] = Field(None, ge=0, description="Cost of LLM API call in USD")
+    llm_request_duration_ms: Optional[float] = Field(None, ge=0, description="LLM API request duration in milliseconds")
+    llm_cache_hit: Optional[bool] = Field(None, description="Whether LLM result was from cache")
+    llm_model: Optional[str] = Field(None, description="LLM model used (e.g., claude-3-5-sonnet)")
+    llm_fallback: Optional[bool] = Field(None, description="Whether fallback rule-based analysis was used")
 
     @field_validator('calculation_timestamp', mode='before')
     @classmethod
@@ -94,6 +101,10 @@ class AIAnalysisData(BaseModel):
         ...,
         description="ML model predictions, keyed by prediction type"
     )
+    partner_ml_scores: Optional[Dict[str, MLScoreBox]] = Field(
+        None,
+        description="Partner's ML predictions (for compatibility analysis)"
+    )
     astrology_scores: Dict[str, Union[int, float]] = Field(
         ...,
         description="Deterministic astrology scores"
@@ -101,6 +112,10 @@ class AIAnalysisData(BaseModel):
     ai_analysis: AIAnalysisSection = Field(
         ...,
         description="AI-generated textual analysis"
+    )
+    kundali_data: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Complete kundali calculation data for LLM analysis"
     )
     metadata: AnalysisMetadata = Field(
         ...,
@@ -231,3 +246,4 @@ class AIAnalysisErrorResponse(BaseModel):
     error_code: str = Field(..., description="Machine-readable error code")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Error timestamp")
     details: Union[Dict, None] = Field(None, description="Additional error details")
+    data: Optional[Dict] = Field(None, description="No data in error responses")
