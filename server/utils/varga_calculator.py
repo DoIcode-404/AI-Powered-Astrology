@@ -443,7 +443,11 @@ class VargaCalculator:
 
             # Compare planet positions
             for planet in self.planets_info.keys():
-                d1_sign = self.planets_info[planet].get('sign')
+                planet_data = self.planets_info[planet]
+                if not isinstance(planet_data, dict):
+                    continue
+
+                d1_sign = planet_data.get('sign')
                 d9_sign = d9_chart['planets'].get(planet, {}).get('navamsha_sign')
 
                 if d1_sign and d9_sign:
@@ -462,8 +466,14 @@ class VargaCalculator:
             }
 
         except Exception as e:
-            logger.error(f"Error comparing D1 D9: {str(e)}")
-            return {}
+            logger.error(f"Error comparing D1 D9: {str(e)}", exc_info=True)
+            return {
+                'alignment_score': 0,
+                'max_score': 90,
+                'alignment_percentage': 0,
+                'details': ['D9 comparison unavailable'],
+                'interpretation': 'Not calculated'
+            }
 
     def _interpret_alignment(self, score: int) -> str:
         """Interpret D1 D9 alignment score."""

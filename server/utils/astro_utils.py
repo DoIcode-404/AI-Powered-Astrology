@@ -550,7 +550,12 @@ def get_julian_day_from_birth_details(birth_details: KundaliRequest) -> float:
 
     try:
         # Parse the datetime string with better error handling
-        dt = datetime.strptime(f"{birth_details.birthDate} {birth_details.birthTime}", "%Y-%m-%d %H:%M")
+        # Accept both HH:MM and HH:MM:SS formats
+        time_str = birth_details.birthTime
+        if time_str.count(':') == 2:  # HH:MM:SS format
+            dt = datetime.strptime(f"{birth_details.birthDate} {time_str}", "%Y-%m-%d %H:%M:%S")
+        else:  # HH:MM format
+            dt = datetime.strptime(f"{birth_details.birthDate} {time_str}", "%Y-%m-%d %H:%M")
         
         # Handle timezone more robustly
         if hasattr(birth_details, 'timezone') and birth_details.timezone:
