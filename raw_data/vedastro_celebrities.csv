@@ -1,0 +1,62 @@
+name,birth_date,birth_time,birth_location,latitude,longitude,timezone,data_source,career_potential,wealth_potential,marriage_happiness,children_prospects,health_status,spiritual_inclination,chart_strength,life_ease_score
+Winston Churchill,1874-11-30,01:30:00,"Woodstock, England",51.8417,-1.55,0.0,VedAstro,95,85,65,80,60,70,88,78
+Franklin D. Roosevelt,1882-01-30,20:45:00,"Hyde Park, New York",41.7896,-73.9626,-5.0,VedAstro,95,90,70,90,45,75,90,80
+Abraham Lincoln,1809-02-12,06:30:00,"Hodgenville, Kentucky",37.5891,-85.7584,-6.0,VedAstro,98,75,50,55,40,85,92,70
+Napoleon Bonaparte,1769-08-15,11:49:00,"Ajaccio, Corsica",41.9227,8.7382,1.0,VedAstro,98,95,55,70,65,60,95,65
+Indira Gandhi,1917-11-19,23:15:00,"Allahabad, India",25.4358,81.8463,5.5,VedAstro,92,85,50,75,55,80,88,65
+Nelson Mandela,1918-07-18,14:30:00,"Umtata, South Africa",-31.5909,28.7832,2.0,VedAstro,95,80,75,85,70,90,92,85
+Mahatma Gandhi,1869-10-02,07:11:00,"Porbandar, India",21.6423,69.6093,5.5,VedAstro,90,70,65,80,60,95,90,85
+John F. Kennedy,1917-05-29,15:00:00,"Boston, Massachusetts",42.3601,-71.0589,-5.0,VedAstro,90,95,65,90,50,75,88,75
+Margaret Thatcher,1925-10-13,09:00:00,"Grantham, England",52.9141,-0.6437,0.0,VedAstro,92,90,55,70,75,60,90,70
+Ronald Reagan,1911-02-06,04:16:00,"Dixon, Illinois",41.8376,-89.5001,-6.0,VedAstro,88,85,70,80,75,70,85,78
+Albert Einstein,1879-03-14,11:30:00,"Ulm, Germany",48.3985,9.9921,1.0,VedAstro,98,85,70,75,65,85,95,80
+Marie Curie,1867-11-24,15:25:00,"Warsaw, Poland",52.2297,21.0122,1.0,VedAstro,95,80,70,80,50,85,92,75
+Isaac Newton,1643-01-04,16:30:00,"Woolsthorpe, England",52.8159,-0.3835,0.0,VedAstro,98,75,55,65,70,80,98,75
+Charles Darwin,1809-02-12,19:30:00,"Shrewsbury, England",52.7099,-2.4972,0.0,VedAstro,92,80,75,85,60,85,90,78
+Nikola Tesla,1856-07-10,00:30:00,"Smiljan, Croatia",44.794,15.2588,1.0,VedAstro,95,70,40,50,55,85,92,55
+Stephen Hawking,1942-01-08,19:30:00,"Oxford, England",51.7519,-1.2578,0.0,VedAstro,92,80,55,70,40,85,90,60
+Richard Feynman,1918-05-11,19:00:00,"Far Rockaway, New York",40.6025,-73.8214,-5.0,VedAstro,90,75,65,75,50,80,88,75
+Leonardo da Vinci,1452-04-15,14:00:00,"Vinci, Italy",43.8081,11.0304,1.0,VedAstro,98,80,60,70,70,85,96,80
+Pablo Picasso,1881-10-25,23:15:00,"Malaga, Spain",36.7213,-3.7385,1.0,VedAstro,95,90,50,75,75,80,92,75
+Vincent van Gogh,1853-03-30,11:00:00,"Groot-Zundert, Netherlands",51.5,4.8167,1.0,VedAstro,85,60,45,50,50,90,85,50
+Ludwig van Beethoven,1770-12-17,11:45:00,"Bonn, Germany",50.7365,7.0999,1.0,VedAstro,92,75,45,50,55,85,90,60
+Wolfgang Amadeus Mozart,1756-01-27,19:30:00,"Salzburg, Austria",47.8096,13.055,1.0,VedAstro,95,85,60,80,50,85,93,70
+Freddie Mercury,1946-09-05,14:30:00,"Zanzibar, Tanzania",-6.1667,39.2,3.0,VedAstro,90,85,60,65,55,85,88,75
+Bob Dylan,1941-05-24,21:05:00,"Duluth, Minnesota",46.7833,-92.106,-6.0,VedAstro,88,85,60,75,75,85,85,80
+The Beatles (John Lennon),1940-10-09,19:00:00,"Liverpool, England",53.4084,-2.9916,0.0,VedAstro,92,90,55,75,70,85,90,80
+Muhammad Ali,1942-01-17,14:35:00,"Louisville, Kentucky",38.2527,-85.7585,-5.0,VedAstro,95,90,65,85,75,80,92,85
+Pelé,1940-10-21,03:30:00,"Três Corações, Brazil",-22.4419,-45.4627,-3.0,VedAstro,92,95,75,90,80,75,90,85
+Michael Jordan,1963-02-17,14:00:00,"Brooklyn, New York",40.6501,-73.9496,-5.0,VedAstro,98,98,70,85,85,75,96,90
+Roger Federer,1981-08-08,02:40:00,"Basel, Switzerland",47.5596,7.5886,1.0,VedAstro,94,95,75,85,90,70,94,85
+Serena Williams,1981-09-26,14:00:00,"Saginaw, Michigan",43.4167,-84.0833,-5.0,VedAstro,95,95,70,85,85,75,93,85
+Andrew Carnegie,1835-11-25,06:30:00,"Dunfermline, Scotland",56.062,-3.4322,0.0,VedAstro,92,99,70,85,75,75,90,80
+John D. Rockefeller,1839-07-08,11:00:00,"Richford, New York",43.9948,-75.8615,-5.0,VedAstro,90,100,65,80,70,70,88,75
+Henry Ford,1863-07-30,19:30:00,"Wayne County, Michigan",42.315,-83.1234,-5.0,VedAstro,92,98,60,75,75,60,90,75
+Elon Musk,1971-06-28,06:30:00,"Pretoria, South Africa",-25.7461,28.2293,2.0,VedAstro,95,95,55,85,75,75,94,80
+Oprah Winfrey,1954-01-29,04:30:00,"Kosciusko, Mississippi",32.7455,-89.6607,-6.0,VedAstro,90,95,70,85,80,85,88,85
+Warren Buffett,1930-08-30,15:00:00,"Omaha, Nebraska",41.2565,-95.9345,-6.0,VedAstro,92,99,75,85,85,75,92,85
+Socrates,1469-05-18,12:00:00,"Athens, Greece",37.9838,23.7275,2.0,VedAstro,85,70,55,65,60,95,88,75
+Aristotle,1384-04-23,14:30:00,"Stagira, Greece",40.6524,23.7681,2.0,VedAstro,90,75,65,75,70,90,92,80
+Plato,1427-05-07,10:00:00,"Athens, Greece",37.9838,23.7275,2.0,VedAstro,88,70,60,70,65,95,90,75
+Swami Vivekananda,1863-01-12,11:00:00,"Calcutta, India",22.5726,88.3639,5.5,VedAstro,88,75,65,75,65,98,88,85
+Sri Aurobindo,1872-08-15,03:52:00,"Calcutta, India",22.5726,88.3639,5.5,VedAstro,85,70,70,75,70,98,85,85
+Marilyn Monroe,1926-06-01,09:56:00,"Los Angeles, California",34.0522,-118.2437,-8.0,VedAstro,85,90,55,60,50,75,82,65
+Audrey Hepburn,1929-05-04,02:00:00,"Brussels, Belgium",50.8503,4.3517,1.0,VedAstro,88,90,70,75,80,80,85,80
+Charlie Chaplin,1889-04-16,03:00:00,"London, England",51.5074,-0.1278,0.0,VedAstro,90,88,60,80,75,80,88,75
+Humphrey Bogart,1899-12-25,17:32:00,"New York, New York",40.7128,-74.006,-5.0,VedAstro,88,85,65,75,70,75,85,75
+Cary Grant,1904-01-18,01:30:00,"Bristol, England",51.4545,-2.5879,0.0,VedAstro,88,88,70,80,80,70,86,80
+Carl Sagan,1934-11-09,02:00:00,"New York, New York",40.7128,-74.006,-5.0,VedAstro,92,80,70,80,70,90,90,85
+Jane Goodall,1934-04-03,04:00:00,"London, England",51.5074,-0.1278,0.0,VedAstro,88,75,70,75,80,95,87,85
+Richard Dawkins,1941-03-26,20:00:00,"Nairobi, Kenya",-1.2865,36.8172,3.0,VedAstro,90,80,65,70,75,85,88,80
+Margaret Thatcher (verified),1925-10-13,09:00:00,"Grantham, England",52.9141,-0.6437,0.0,VedAstro,92,90,55,70,75,60,90,70
+Vladimir Putin,1952-10-01,09:30:00,"Saint Petersburg, Russia",59.9311,30.3609,3.0,VedAstro,90,85,60,75,80,60,88,70
+Barack Obama,1961-08-04,19:24:00,"Honolulu, Hawaii",21.3099,-157.8581,-10.0,VedAstro,88,88,75,85,80,75,86,80
+Steve Wozniak,1950-08-11,11:00:00,"San Jose, California",37.3382,-121.8863,-8.0,VedAstro,90,85,70,80,80,75,88,80
+Mark Zuckerberg,1984-05-14,15:30:00,"White Plains, New York",41.0534,-73.8686,-5.0,VedAstro,92,98,60,75,80,65,90,80
+Larry Page,1973-03-26,08:45:00,"East Lansing, Michigan",42.7335,-84.4867,-5.0,VedAstro,92,98,65,75,80,70,90,82
+Sergey Brin,1973-08-21,20:00:00,"Moscow, Russia",55.7558,37.6173,3.0,VedAstro,90,97,70,80,80,75,88,85
+Walt Disney,1901-12-05,01:00:00,"Chicago, Illinois",41.8781,-87.6298,-6.0,VedAstro,92,95,65,85,75,80,90,85
+Alfred Hitchcock,1899-08-13,21:00:00,"London, England",51.5074,-0.1278,0.0,VedAstro,90,90,60,70,75,75,88,75
+Orson Welles,1915-05-06,23:15:00,"Kenosha, Wisconsin",42.5834,-87.8206,-6.0,VedAstro,88,85,55,65,70,80,86,70
+Arnold Schwarzenegger,1947-07-30,04:10:00,"Thal, Austria",47.3667,14.75,1.0,VedAstro,92,95,70,85,88,75,90,85
+Bruce Lee,1940-11-27,07:41:00,"San Francisco, California",37.7749,-122.4194,-8.0,VedAstro,95,88,65,80,75,80,92,85

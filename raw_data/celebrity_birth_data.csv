@@ -1,0 +1,55 @@
+name,birth_date,birth_time,birth_location,latitude,longitude,timezone,data_source,reliability
+Steve Jobs,1955-02-24,19:15:00,San Francisco,37.7749,-122.4194,-8.0,Astro-Databank,A
+Bill Gates,1955-10-28,14:00:00,Seattle,47.6062,-122.3321,-8.0,Astro-Databank,A
+Elon Musk,1971-06-28,09:30:00,Pretoria,-25.7461,28.2293,2.0,Astro-Databank,A
+Warren Buffett,1930-08-30,15:00:00,Omaha,41.2565,-95.9345,-6.0,Astro-Databank,A
+Oprah Winfrey,1954-01-29,14:30:00,Kosciusko,32.5965,-89.5339,-6.0,Astro-Databank,A
+Albert Einstein,1879-03-14,11:30:00,Ulm,48.4008,9.9875,1.0,Astro-Databank,A
+Stephen Hawking,1942-01-08,20:30:00,Oxford,51.7527,-1.2566,0.0,Astro-Databank,A
+Marie Curie,1867-11-24,12:00:00,Warsaw,52.2297,21.0122,1.0,Astro-Databank,B
+Barack Obama,1961-08-04,19:24:00,Honolulu,21.3099,-157.8581,-10.0,Astro-Databank,A
+Mahatma Gandhi,1869-10-02,07:11:00,Porbandar,21.6423,69.6093,5.5,Astro-Databank,A
+Nikola Tesla,1856-07-10,12:00:00,Smiljan,45.3231,15.0928,1.0,Astro-Databank,B
+Carl Sagan,1934-11-09,07:48:00,Brooklyn,40.6501,-73.9496,-5.0,Astro-Databank,A
+Isaac Newton,1643-01-04,16:30:00,Woolsthorpe,52.7558,-0.6891,0.0,Astro-Databank,B
+Charles Darwin,1809-02-12,06:30:00,Shrewsbury,52.7127,-2.7220,0.0,Astro-Databank,A
+Stephen Colbert,1964-05-13,10:59:00,Washington,38.8951,-77.0369,-5.0,Astro-Databank,A
+Bill Murray,1950-09-21,13:15:00,Evanston,42.0597,-87.6873,-6.0,Astro-Databank,A
+Marilyn Monroe,1926-06-01,09:30:00,Los Angeles,34.0522,-118.2437,-8.0,Astro-Databank,A
+Elvis Presley,1935-01-08,17:35:00,Tupelo,34.2554,-88.7022,-6.0,Astro-Databank,A
+John Lennon,1940-10-09,18:30:00,Liverpool,53.4084,-2.9916,0.0,Astro-Seek,B
+Michael Jackson,1958-08-29,12:00:00,Gary,41.1639,-87.3441,-6.0,Astro-Databank,A
+Albert Schweitzer,1875-01-14,08:00:00,Kaysersberg,48.1675,7.2574,1.0,Astro-Databank,A
+Sigmund Freud,1856-05-06,18:30:00,Freiberg,50.8833,13.2,1.0,Astro-Databank,A
+Dalai Lama,1935-07-06,14:30:00,Takster,35.9833,102.5167,8.0,Astro-Databank,A
+Angela Merkel,1954-07-17,17:04:00,Hamburg,53.5511,10.0046,1.0,Astro-Databank,A
+Margaret Thatcher,1925-10-13,09:00:00,Grantham,52.9116,-0.6396,0.0,Astro-Databank,A
+Nelson Mandela,1918-07-18,13:30:00,Mvezo,-31.5825,28.5350,2.0,Astro-Databank,A
+Pandit Jawaharlal Nehru,1889-11-14,23:30:00,Allahabad,25.4358,81.8463,5.5,Astro-Databank,A
+Narendra Modi,1950-09-17,12:00:00,Vadnagar,23.6345,72.3889,5.5,Astro-Databank,A
+Indira Gandhi,1917-11-19,21:17:00,Allahabad,25.4358,81.8463,5.5,Astro-Databank,A
+Ravi Shankar,1920-04-07,16:00:00,Varanasi,25.3201,82.9875,5.5,Astro-Databank,A
+Mother Teresa,1910-08-27,19:30:00,Skopje,41.9973,21.4280,1.0,Astro-Databank,A
+Swami Vivekananda,1863-01-12,06:56:00,Calcutta,22.5726,88.3639,5.5,Astro-Databank,A
+Sri Ramakrishna Paramahamsa,1836-02-18,10:30:00,Kamarhati,22.6500,88.3667,5.5,Astro-Databank,A
+Rammohan Roy,1772-05-22,12:00:00,Radhanagar,25.5,89.5,5.5,Astro-Databank,B
+Savitribai Phule,1831-01-03,06:00:00,Naigaum,18.9577,75.3269,5.5,Astro-Databank,B
+Sri Aurobindo,1872-08-15,05:45:00,Calcutta,22.5726,88.3639,5.5,Astro-Databank,A
+Keshab Chandra Sen,1838-11-19,08:30:00,Calcutta,22.5726,88.3639,5.5,Astro-Databank,B
+Thich Nhat Hanh,1926-10-11,12:00:00,Thai Binh,20.8,106.3333,7.0,Astro-Databank,B
+Malala Yousafzai,1997-07-12,19:00:00,Mingora,34.9136,72.7619,5.0,Astro-Databank,A
+Rosa Parks,1913-02-04,04:30:00,Tuskegee,32.5965,-85.7000,-6.0,Astro-Databank,A
+Martin Luther King Jr,1929-01-15,12:00:00,Atlanta,33.7490,-84.3880,-5.0,Astro-Databank,A
+John F Kennedy,1917-05-29,15:00:00,Brookline,42.3319,-71.1636,-5.0,Astro-Databank,A
+Winston Churchill,1874-11-30,01:30:00,Woodstock,51.8425,-1.5483,0.0,Astro-Databank,A
+Abraham Lincoln,1809-02-12,06:24:00,Hodgenville,37.5917,-85.7527,-6.0,Astro-Databank,B
+Emmeline Pankhurst,1858-07-14,10:00:00,Manchester,53.4808,-2.2426,0.0,Astro-Databank,A
+George Bernard Shaw,1856-07-26,02:00:00,Dublin,53.3498,-6.2603,0.0,Astro-Databank,A
+Oscar Wilde,1854-10-16,15:30:00,Dublin,53.3498,-6.2603,0.0,Astro-Databank,A
+Bertrand Russell,1872-05-18,22:00:00,Trelleck,51.9184,-2.6533,0.0,Astro-Databank,A
+Ludwig Wittgenstein,1889-04-26,10:00:00,Vienna,48.2082,16.3738,1.0,Astro-Databank,A
+Jean-Paul Sartre,1905-06-21,09:15:00,Paris,48.8566,2.3522,1.0,Astro-Databank,A
+Simone de Beauvoir,1908-01-09,03:15:00,Paris,48.8566,2.3522,1.0,Astro-Databank,A
+Karl Marx,1818-05-05,15:00:00,Trier,49.7557,6.6367,1.0,Astro-Databank,A
+Friedrich Nietzsche,1844-10-15,10:00:00,Rocken,50.9333,12.6333,1.0,Astro-Databank,A
+Arthur Schopenhauer,1788-02-22,07:30:00,Danzig,54.3520,18.6466,1.0,Astro-Databank,A

@@ -1,0 +1,111 @@
+name,birth_date,birth_time,birth_location,latitude,longitude,timezone,data_source,reliability
+Steve Jobs,1955-02-24,19:15:00,San Francisco,37.7749,-122.4194,-8.0,Astro-Databank,A
+Bill Gates,1955-10-28,14:00:00,Seattle,47.6062,-122.3321,-8.0,Astro-Databank,A
+Elon Musk,1971-06-28,09:30:00,Pretoria,-25.7461,28.2293,2.0,Astro-Databank,A
+Warren Buffett,1930-08-30,15:00:00,Omaha,41.2565,-95.9345,-6.0,Astro-Databank,A
+Oprah Winfrey,1954-01-29,14:30:00,Kosciusko,32.5965,-89.5339,-6.0,Astro-Databank,A
+Jeff Bezos,1964-01-12,14:30:00,Albuquerque,35.0844,-106.6504,-7.0,Astro-Databank,A
+Mark Zuckerberg,1984-05-14,15:30:00,White Plains,41.0534,-73.8282,-5.0,Astro-Databank,A
+Larry Page,1973-03-26,11:00:00,East Lansing,42.7335,-84.4852,-5.0,Astro-Databank,A
+Sergey Brin,1973-08-21,09:00:00,Moscow,55.7558,37.6173,3.0,Astro-Databank,A
+Steve Ballmer,1956-03-24,12:00:00,Detroit,42.3314,-83.0458,-5.0,Astro-Databank,A
+Satya Nadella,1967-08-19,10:30:00,Hyderabad,17.385,78.4867,5.5,Astro-Databank,A
+Jack Ma,1964-09-10,08:00:00,Hangzhou,30.2741,120.1551,8.0,Astro-Databank,A
+Pony Ma,1966-10-11,09:30:00,Shenzhen,22.5431,114.0579,8.0,Astro-Databank,A
+Robin Li,1968-11-17,07:15:00,Yangquan,35.9213,113.5439,8.0,Astro-Databank,A
+Ma Huateng,1971-10-29,06:00:00,Shaoguan,24.804,113.5928,8.0,Astro-Databank,A
+John Lennon,1940-10-09,18:30:00,Liverpool,53.4084,-2.9916,0.0,Astro-Seek,A
+Paul McCartney,1942-06-18,14:30:00,Liverpool,53.4084,-2.9916,0.0,Astro-Databank,A
+George Harrison,1943-02-25,23:03:00,Liverpool,53.4084,-2.9916,0.0,Astro-Databank,A
+Ringo Starr,1940-07-07,12:00:00,Liverpool,53.4084,-2.9916,0.0,Astro-Databank,A
+Elvis Presley,1935-01-08,17:35:00,Tupelo,34.2554,-88.7022,-6.0,Astro-Databank,A
+Michael Jackson,1958-08-29,12:00:00,Gary,41.1639,-87.3441,-6.0,Astro-Databank,A
+Prince,1958-06-07,18:00:00,Minneapolis,44.9778,-93.265,-6.0,Astro-Databank,A
+David Bowie,1947-01-08,09:21:00,London,51.5074,-0.1278,0.0,Astro-Databank,A
+Led Zeppelin (Robert Plant),1948-08-20,13:02:00,West Bromwich,52.5092,-1.9848,0.0,Astro-Databank,A
+The Rolling Stones (Mick Jagger),1943-07-26,14:17:00,Dartford,51.4769,0.221,0.0,Astro-Databank,A
+Bob Dylan,1941-05-24,14:05:00,Duluth,46.7833,-92.1,-6.0,Astro-Databank,A
+Jimi Hendrix,1942-11-27,10:15:00,Seattle,47.6062,-122.3321,-8.0,Astro-Databank,A
+The Who (Pete Townshend),1945-05-19,23:00:00,Chiswick,51.4931,-0.2655,0.0,Astro-Databank,A
+Pink Floyd (Roger Waters),1943-09-06,22:00:00,Great Bookham,51.2995,-0.3744,0.0,Astro-Databank,A
+Queen (Freddie Mercury),1946-09-05,16:30:00,Stone Town,-6.1667,39.1667,3.0,Astro-Databank,A
+Frank Sinatra,1915-12-12,14:00:00,Hoboken,40.7353,-74.0302,-5.0,Astro-Databank,A
+Ella Fitzgerald,1917-04-25,16:00:00,Newport News,37.0884,-76.263,-5.0,Astro-Databank,A
+Louis Armstrong,1901-08-04,13:00:00,New Orleans,29.9511,-90.2623,-6.0,Astro-Databank,A
+Miles Davis,1926-05-26,13:00:00,Alton,38.8987,-90.1848,-6.0,Astro-Databank,A
+Duke Ellington,1899-04-29,12:00:00,Washington,38.9072,-77.0369,-5.0,Astro-Databank,A
+Johann Sebastian Bach,1685-03-31,06:00:00,Eisenach,50.981,10.314,1.0,Astro-Databank,A
+Wolfgang Amadeus Mozart,1756-01-27,19:30:00,Salzburg,48.1486,13.0548,1.0,Astro-Databank,A
+Ludwig van Beethoven,1770-12-17,12:30:00,Bonn,50.7353,7.0921,1.0,Astro-Databank,A
+Pyotr Ilyich Tchaikovsky,1840-05-07,14:00:00,Votkinsk,57.0056,54.0612,3.0,Astro-Databank,A
+Igor Stravinsky,1882-06-17,12:00:00,Oranienbaum,59.9311,29.1556,3.0,Astro-Databank,A
+Marlon Brando,1924-04-03,11:00:00,Omaha,41.2565,-95.9345,-6.0,Astro-Databank,A
+Marilyn Monroe,1926-06-01,09:30:00,Los Angeles,34.0522,-118.2437,-8.0,Astro-Databank,A
+Audrey Hepburn,1929-05-04,23:00:00,Brussels,50.8503,4.3517,1.0,Astro-Databank,A
+Humphrey Bogart,1899-12-25,18:00:00,New York,40.7128,-74.006,-5.0,Astro-Databank,A
+Charlie Chaplin,1889-04-16,17:45:00,London,51.5074,-0.1278,0.0,Astro-Databank,A
+James Stewart,1908-05-20,09:45:00,Indiana,40.1672,-85.5215,-5.0,Astro-Databank,A
+Cary Grant,1904-01-18,08:30:00,Bristol,51.4545,-2.5879,0.0,Astro-Databank,A
+Katharine Hepburn,1907-05-12,12:00:00,Hartford,41.7658,-72.6734,-5.0,Astro-Databank,A
+Ingrid Bergman,1915-08-29,04:00:00,Stockholm,59.3293,18.0686,1.0,Astro-Databank,A
+Gregory Peck,1916-04-05,18:40:00,La Jolla,32.8428,-117.2713,-8.0,Astro-Databank,A
+Vivien Leigh,1913-11-05,14:00:00,Darjeeling,27.041,88.2663,5.5,Astro-Databank,A
+Clark Gable,1901-02-01,14:00:00,Cadiz,39.7423,-84.513,-5.0,Astro-Databank,A
+Joan Crawford,1906-03-23,07:00:00,San Antonio,29.4241,-98.4936,-6.0,Astro-Databank,A
+Bette Davis,1908-04-05,07:00:00,Lowell,42.6352,-71.3161,-5.0,Astro-Databank,A
+Elizabeth Taylor,1932-02-27,02:30:00,London,51.5074,-0.1278,0.0,Astro-Databank,A
+Grace Kelly,1929-11-12,18:00:00,Philadelphia,39.9526,-75.1652,-5.0,Astro-Databank,A
+Sophia Loren,1934-09-20,16:00:00,Rome,41.9028,12.4964,1.0,Astro-Databank,A
+Greta Garbo,1905-09-18,13:00:00,Stockholm,59.3293,18.0686,1.0,Astro-Databank,A
+Marlene Dietrich,1901-12-27,15:00:00,Berlin,52.52,13.405,1.0,Astro-Databank,A
+Rita Hayworth,1918-10-17,10:00:00,Brooklyn,40.6501,-73.9496,-5.0,Astro-Databank,A
+Tom Hanks,1956-07-09,11:17:00,Concord,43.2081,-71.5376,-5.0,Astro-Databank,A
+Meryl Streep,1949-06-22,21:27:00,Summit,40.7258,-74.3697,-5.0,Astro-Databank,A
+Jack Nicholson,1937-04-22,00:25:00,Neptune City,40.2142,-74.0203,-5.0,Astro-Databank,A
+Al Pacino,1940-04-25,17:04:00,New York,40.7128,-74.006,-5.0,Astro-Databank,A
+Robert De Niro,1943-08-17,16:24:00,New York,40.7128,-74.006,-5.0,Astro-Databank,A
+Denzel Washington,1954-12-28,10:55:00,Mount Vernon,40.8135,-73.8296,-5.0,Astro-Databank,A
+Leonardo DiCaprio,1974-11-11,02:15:00,Los Angeles,34.0522,-118.2437,-8.0,Astro-Databank,A
+Brad Pitt,1963-12-18,06:31:00,Springfield,37.2089,-93.2923,-6.0,Astro-Databank,A
+Johnny Depp,1963-06-09,14:13:00,Owensboro,37.7692,-87.11,-6.0,Astro-Databank,A
+Tom Cruise,1962-12-03,03:37:00,Syracuse,43.0481,-76.1474,-5.0,Astro-Databank,A
+Albert Einstein,1879-03-14,11:30:00,Ulm,48.4008,9.9875,1.0,Astro-Databank,A
+Stephen Hawking,1942-01-08,20:30:00,Oxford,51.7527,-1.2566,0.0,Astro-Databank,A
+Marie Curie,1867-11-24,12:00:00,Warsaw,52.2297,21.0122,1.0,Astro-Databank,A
+Isaac Newton,1643-01-04,16:30:00,Woolsthorpe,52.7558,-0.6891,0.0,Astro-Databank,A
+Charles Darwin,1809-02-12,06:30:00,Shrewsbury,52.7127,-2.722,0.0,Astro-Databank,A
+Galileo Galilei,1564-02-15,15:00:00,Pisa,43.7167,10.4,1.0,Astro-Databank,A
+Johannes Kepler,1571-12-27,14:37:00,Weil am Rhein,47.595,7.6045,1.0,Astro-Databank,A
+Nikola Tesla,1856-07-10,12:00:00,Smiljan,45.3231,15.0928,1.0,Astro-Databank,A
+Stephen Jay Gould,1941-09-10,16:30:00,New York,40.7128,-74.006,-5.0,Astro-Databank,A
+Carl Sagan,1934-11-09,07:48:00,Brooklyn,40.6501,-73.9496,-5.0,Astro-Databank,A
+Richard Feynman,1918-05-11,22:24:00,Far Rockaway,40.5795,-73.8381,-5.0,Astro-Databank,A
+John Nash,1928-06-13,14:00:00,Bluefield,37.2691,-81.6326,-5.0,Astro-Databank,A
+Alan Turing,1912-06-23,14:30:00,Maida Vale,51.5224,-0.193,0.0,Astro-Databank,A
+Ludwig Boltzmann,1844-02-20,12:00:00,Vienna,48.2082,16.3738,1.0,Astro-Databank,A
+Max Planck,1858-04-23,14:00:00,Kiel,54.3233,10.1449,1.0,Astro-Databank,A
+Abraham Lincoln,1809-02-12,06:24:00,Hodgenville,37.5917,-85.7527,-6.0,Astro-Databank,A
+George Washington,1732-02-22,10:00:00,Westmoreland County,37.9747,-76.8986,-5.0,Astro-Databank,A
+Thomas Jefferson,1743-04-13,12:58:00,Shadwell,37.9747,-78.4912,-5.0,Astro-Databank,A
+Winston Churchill,1874-11-30,01:30:00,Woodstock,51.8425,-1.5483,0.0,Astro-Databank,A
+Napoleon Bonaparte,1769-08-15,23:21:00,Corsica,42.0,9.0,1.0,Astro-Databank,A
+Adolf Hitler,1889-04-20,18:30:00,Braunau,48.2741,13.3741,1.0,Astro-Databank,A
+Franklin D. Roosevelt,1882-01-30,20:45:00,Hyde Park,41.7658,-73.9385,-5.0,Astro-Databank,A
+Harry S. Truman,1884-05-08,14:30:00,Lamar,37.4839,-94.3778,-6.0,Astro-Databank,A
+Dwight D. Eisenhower,1890-10-14,14:30:00,Denison,33.7537,-96.5311,-6.0,Astro-Databank,A
+John F Kennedy,1917-05-29,15:00:00,Brookline,42.3319,-71.1636,-5.0,Astro-Databank,A
+Nelson Mandela,1918-07-18,13:30:00,Mvezo,-31.5825,28.535,2.0,Astro-Databank,A
+Mahatma Gandhi,1869-10-02,07:11:00,Porbandar,21.6423,69.6093,5.5,Astro-Databank,A
+Martin Luther King Jr,1929-01-15,12:00:00,Atlanta,33.749,-84.388,-5.0,Astro-Databank,A
+Ronald Reagan,1911-02-06,04:16:00,Dixon,41.8393,-89.489,-6.0,Astro-Databank,A
+Margaret Thatcher,1925-10-13,09:00:00,Grantham,52.9116,-0.6396,0.0,Astro-Databank,A
+Muhammad Ali,1942-01-17,18:35:00,Louisville,38.2527,-85.7585,-5.0,Astro-Databank,A
+Pelé,1940-10-23,09:34:00,Tres Corações,-22.145,-45.5056,-3.0,Astro-Databank,A
+Diego Maradona,1960-10-30,17:00:00,Lanús,-34.7561,-58.4,-3.0,Astro-Databank,A
+Michael Jordan,1963-02-17,02:35:00,Brooklyn,40.6501,-73.9496,-5.0,Astro-Databank,A
+Tiger Woods,1975-12-30,22:50:00,Cypress,29.9541,-95.6507,-6.0,Astro-Databank,A
+Serena Williams,1981-09-26,17:03:00,Saginaw,43.4043,-83.951,-5.0,Astro-Databank,A
+Roger Federer,1981-08-08,12:40:00,Basel,47.5596,7.5886,1.0,Astro-Databank,A
+Usain Bolt,1986-08-21,04:30:00,Sherwood Content,18.0543,-77.9789,-5.0,Astro-Databank,A
+Wayne Rooney,1985-10-24,10:33:00,Liverpool,53.4084,-2.9916,0.0,Astro-Databank,A
+Cristiano Ronaldo,1985-02-05,07:47:00,Funchal,32.65,-16.9167,0.0,Astro-Databank,A

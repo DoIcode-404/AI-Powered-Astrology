@@ -1,0 +1,6 @@
+name,birth_date,birth_time,birth_location,latitude,longitude,timezone,data_source
+Albert Einstein,1879-03-14,11:30:00,Ulm,48.4008,9.9875,1.0,Astro-Seek
+Marie Curie,1867-11-24,12:00:00,Warsaw,52.2297,21.0122,1.0,Astro-Seek
+Isaac Newton,1643-01-04,16:30:00,Woolsthorpe,52.7558,-0.6891,0.0,Astro-Seek
+Galileo Galilei,1564-02-15,15:00:00,Pisa,43.7167,10.4,1.0,Astro-Seek
+Stephen Hawking,1942-01-08,20:30:00,Oxford,51.7527,-1.2566,0.0,Astro-Seek

@@ -1,0 +1,99 @@
+name,birth_date,birth_time,birth_location,latitude,longitude,timezone,data_source,career_potential,wealth_potential,marriage_happiness,children_prospects,health_status,spiritual_inclination,chart_strength,life_ease_score
+Steve Jobs,1955-02-24,19:15:00,San Francisco,37.7749,-122.4194,-8.0,Astro-Databank,95,95,60,75,50,80,90,85
+Bill Gates,1955-10-28,14:00:00,Seattle,47.6062,-122.3321,-8.0,Astro-Databank,95,100,85,90,85,75,95,90
+Elon Musk,1971-06-28,09:30:00,Pretoria,-25.7461,28.2293,2.0,Astro-Databank,100,95,55,65,80,60,95,75
+Warren Buffett,1930-08-30,15:00:00,Omaha,41.2565,-95.9345,-6.0,Astro-Databank,100,100,85,90,90,75,98,90
+Oprah Winfrey,1954-01-29,14:30:00,Kosciusko,32.5965,-89.5339,-6.0,Astro-Databank,100,95,70,75,75,85,95,88
+Jeff Bezos,1964-01-12,14:30:00,Albuquerque,35.0844,-106.6504,-7.0,Astro-Databank,95,100,60,70,80,60,95,80
+Mark Zuckerberg,1984-05-14,15:30:00,White Plains,41.0534,-73.8282,-5.0,Astro-Databank,90,95,70,75,85,65,90,80
+Larry Page,1973-03-26,11:00:00,East Lansing,42.7335,-84.4852,-5.0,Astro-Databank,95,95,65,70,85,70,93,82
+Sergey Brin,1973-08-21,09:00:00,Moscow,55.7558,37.6173,3.0,Astro-Databank,90,90,70,75,80,75,92,81
+Jack Ma,1964-09-10,08:00:00,Hangzhou,30.2741,120.1551,8.0,Astro-Databank,95,95,65,70,85,80,92,82
+John Lennon,1940-10-09,18:30:00,Liverpool,53.4084,-2.9916,0.0,Astro-Seek,95,85,50,75,45,85,90,65
+Paul McCartney,1942-06-18,14:30:00,Liverpool,53.4084,-2.9916,0.0,Astro-Databank,90,90,75,75,80,75,88,80
+George Harrison,1943-02-25,23:03:00,Liverpool,53.4084,-2.9916,0.0,Astro-Databank,85,85,70,70,75,90,85,77
+Ringo Starr,1940-07-07,12:00:00,Liverpool,53.4084,-2.9916,0.0,Astro-Databank,80,80,75,75,80,70,82,75
+Elvis Presley,1935-01-08,17:35:00,Tupelo,34.2554,-88.7022,-6.0,Astro-Databank,95,90,40,75,50,80,88,65
+Michael Jackson,1958-08-29,12:00:00,Gary,41.1639,-87.3441,-6.0,Astro-Databank,100,95,50,85,50,85,92,70
+Prince,1958-06-07,18:00:00,Minneapolis,44.9778,-93.265,-6.0,Astro-Databank,95,90,55,65,50,85,90,70
+David Bowie,1947-01-08,09:21:00,London,51.5074,-0.1278,0.0,Astro-Databank,90,85,60,70,60,85,88,75
+Bob Dylan,1941-05-24,14:05:00,Duluth,46.7833,-92.1,-6.0,Astro-Databank,95,80,50,70,70,90,92,75
+Jimi Hendrix,1942-11-27,10:15:00,Seattle,47.6062,-122.3321,-8.0,Astro-Databank,95,75,40,60,40,90,90,65
+Marlon Brando,1924-04-03,11:00:00,Omaha,41.2565,-95.9345,-6.0,Astro-Databank,95,90,60,70,70,75,90,78
+Marilyn Monroe,1926-06-01,09:30:00,Los Angeles,34.0522,-118.2437,-8.0,Astro-Databank,80,80,40,60,50,70,75,55
+Audrey Hepburn,1929-05-04,23:00:00,Brussels,50.8503,4.3517,1.0,Astro-Databank,90,85,75,75,75,80,88,80
+Humphrey Bogart,1899-12-25,18:00:00,New York,40.7128,-74.006,-5.0,Astro-Databank,90,85,70,70,70,75,85,75
+Tom Hanks,1956-07-09,11:17:00,Concord,43.2081,-71.5376,-5.0,Astro-Databank,90,85,85,85,85,70,88,82
+Meryl Streep,1949-06-22,21:27:00,Summit,40.7258,-74.3697,-5.0,Astro-Databank,95,85,80,80,85,75,92,83
+Leonardo DiCaprio,1974-11-11,02:15:00,Los Angeles,34.0522,-118.2437,-8.0,Astro-Databank,90,90,60,65,80,70,88,75
+Brad Pitt,1963-12-18,06:31:00,Springfield,37.2089,-93.2923,-6.0,Astro-Databank,85,85,55,65,80,65,85,70
+Johnny Depp,1963-06-09,14:13:00,Owensboro,37.7692,-87.11,-6.0,Astro-Databank,85,85,50,65,75,70,85,70
+Tom Cruise,1962-12-03,03:37:00,Syracuse,43.0481,-76.1474,-5.0,Astro-Databank,90,90,60,70,85,60,88,75
+Albert Einstein,1879-03-14,11:30:00,Ulm,48.4008,9.9875,1.0,Astro-Databank,95,80,50,70,60,95,99,75
+Stephen Hawking,1942-01-08,20:30:00,Oxford,51.7527,-1.2566,0.0,Astro-Databank,90,75,50,65,30,90,98,60
+Marie Curie,1867-11-24,12:00:00,Warsaw,52.2297,21.0122,1.0,Astro-Databank,100,70,60,70,40,90,95,65
+Isaac Newton,1643-01-04,16:30:00,Woolsthorpe,52.7558,-0.6891,0.0,Astro-Databank,100,60,30,50,60,95,99,55
+Charles Darwin,1809-02-12,06:30:00,Shrewsbury,52.7127,-2.722,0.0,Astro-Databank,100,75,75,85,75,85,96,80
+Nikola Tesla,1856-07-10,12:00:00,Smiljan,45.3231,15.0928,1.0,Astro-Databank,90,50,20,30,50,95,95,45
+Carl Sagan,1934-11-09,07:48:00,Brooklyn,40.6501,-73.9496,-5.0,Astro-Databank,95,75,70,70,70,95,93,82
+Richard Feynman,1918-05-11,22:24:00,Far Rockaway,40.5795,-73.8381,-5.0,Astro-Databank,95,80,60,75,70,90,94,78
+Alan Turing,1912-06-23,14:30:00,Maida Vale,51.5224,-0.193,0.0,Astro-Databank,95,70,30,50,60,90,96,65
+John Nash,1928-06-13,14:00:00,Bluefield,37.2691,-81.6326,-5.0,Astro-Databank,90,80,50,75,70,85,95,75
+Abraham Lincoln,1809-02-12,06:24:00,Hodgenville,37.5917,-85.7527,-6.0,Astro-Databank,95,65,70,80,60,90,92,75
+Winston Churchill,1874-11-30,01:30:00,Woodstock,51.8425,-1.5483,0.0,Astro-Databank,95,80,65,85,75,75,88,78
+John F Kennedy,1917-05-29,15:00:00,Brookline,42.3319,-71.1636,-5.0,Astro-Databank,90,85,65,80,50,70,85,70
+Franklin D. Roosevelt,1882-01-30,20:45:00,Hyde Park,41.7658,-73.9385,-5.0,Astro-Databank,95,80,75,85,60,75,90,78
+Nelson Mandela,1918-07-18,13:30:00,Mvezo,-31.5825,28.535,2.0,Astro-Databank,100,75,85,90,80,95,95,88
+Mahatma Gandhi,1869-10-02,07:11:00,Porbandar,21.6423,69.6093,5.5,Astro-Databank,100,40,70,75,60,99,95,70
+Martin Luther King Jr,1929-01-15,12:00:00,Atlanta,33.749,-84.388,-5.0,Astro-Databank,95,60,75,85,60,98,93,78
+Ronald Reagan,1911-02-06,04:16:00,Dixon,41.8393,-89.489,-6.0,Astro-Databank,90,85,75,85,85,65,85,78
+Margaret Thatcher,1925-10-13,09:00:00,Grantham,52.9116,-0.6396,0.0,Astro-Databank,95,80,70,75,75,65,88,78
+Barack Obama,1961-08-04,19:24:00,Honolulu,21.3099,-157.8581,-10.0,Astro-Databank,95,85,85,85,85,80,90,87
+Muhammad Ali,1942-01-17,18:35:00,Louisville,38.2527,-85.7585,-5.0,Astro-Databank,95,85,55,70,80,70,90,78
+Pelé,1940-10-23,09:34:00,Tres Corações,-22.145,-45.5056,-3.0,Astro-Databank,95,85,75,80,85,70,90,82
+Diego Maradona,1960-10-30,17:00:00,Lanús,-34.7561,-58.4,-3.0,Astro-Databank,90,80,45,75,75,75,88,73
+Michael Jordan,1963-02-17,02:35:00,Brooklyn,40.6501,-73.9496,-5.0,Astro-Databank,100,95,70,75,90,70,95,85
+Tiger Woods,1975-12-30,22:50:00,Cypress,29.9541,-95.6507,-6.0,Astro-Databank,95,95,60,70,80,60,92,78
+Serena Williams,1981-09-26,17:03:00,Saginaw,43.4043,-83.951,-5.0,Astro-Databank,95,90,75,80,90,75,93,83
+Roger Federer,1981-08-08,12:40:00,Basel,47.5596,7.5886,1.0,Astro-Databank,95,90,80,85,90,70,93,84
+Usain Bolt,1986-08-21,04:30:00,Sherwood Content,18.0543,-77.9789,-5.0,Astro-Databank,90,90,75,80,95,65,92,83
+Wayne Rooney,1985-10-24,10:33:00,Liverpool,53.4084,-2.9916,0.0,Astro-Databank,85,85,70,80,85,60,85,78
+Cristiano Ronaldo,1985-02-05,07:47:00,Funchal,32.65,-16.9167,0.0,Astro-Databank,95,95,70,80,95,70,95,85
+Pandit Jawaharlal Nehru,1889-11-14,23:30:00,Allahabad,25.4358,81.8463,5.5,Astro-Databank,95,75,70,75,75,80,90,78
+Narendra Modi,1950-09-17,12:00:00,Vadnagar,23.6345,72.3889,5.5,Astro-Databank,85,75,75,65,80,75,85,75
+Indira Gandhi,1917-11-19,21:17:00,Allahabad,25.4358,81.8463,5.5,Astro-Databank,90,75,70,80,75,75,88,76
+Ravi Shankar,1920-04-07,16:00:00,Varanasi,25.3201,82.9875,5.5,Astro-Databank,90,75,60,65,70,95,90,78
+Mother Teresa,1910-08-27,19:30:00,Skopje,41.9973,21.428,1.0,Astro-Databank,85,30,85,60,70,100,95,80
+Swami Vivekananda,1863-01-12,06:56:00,Calcutta,22.5726,88.3639,5.5,Astro-Databank,85,50,75,60,60,99,92,72
+Sri Ramakrishna Paramahamsa,1836-02-18,10:30:00,Kamarhati,22.65,88.3667,5.5,Astro-Databank,75,30,80,65,70,100,95,75
+Rammohan Roy,1772-05-22,12:00:00,Radhanagar,25.5,89.5,5.5,Astro-Databank,85,60,75,80,75,95,88,77
+Savitribai Phule,1831-01-03,06:00:00,Naigaum,18.9577,75.3269,5.5,Astro-Databank,85,50,75,70,80,95,88,78
+Sri Aurobindo,1872-08-15,05:45:00,Calcutta,22.5726,88.3639,5.5,Astro-Databank,85,45,80,70,75,99,93,78
+Napoleon Bonaparte,1769-08-15,11:49:00,"Ajaccio, Corsica",41.9227,8.7382,1.0,VedAstro,98,95,55,70,65,60,95,65
+John F. Kennedy,1917-05-29,15:00:00,"Boston, Massachusetts",42.3601,-71.0589,-5.0,VedAstro,90,95,65,90,50,75,88,75
+Leonardo da Vinci,1452-04-15,14:00:00,"Vinci, Italy",43.8081,11.0304,1.0,VedAstro,98,80,60,70,70,85,96,80
+Pablo Picasso,1881-10-25,23:15:00,"Malaga, Spain",36.7213,-3.7385,1.0,VedAstro,95,90,50,75,75,80,92,75
+Vincent van Gogh,1853-03-30,11:00:00,"Groot-Zundert, Netherlands",51.5,4.8167,1.0,VedAstro,85,60,45,50,50,90,85,50
+Ludwig van Beethoven,1770-12-17,11:45:00,"Bonn, Germany",50.7365,7.0999,1.0,VedAstro,92,75,45,50,55,85,90,60
+Wolfgang Amadeus Mozart,1756-01-27,19:30:00,"Salzburg, Austria",47.8096,13.055,1.0,VedAstro,95,85,60,80,50,85,93,70
+Freddie Mercury,1946-09-05,14:30:00,"Zanzibar, Tanzania",-6.1667,39.2,3.0,VedAstro,90,85,60,65,55,85,88,75
+The Beatles (John Lennon),1940-10-09,19:00:00,"Liverpool, England",53.4084,-2.9916,0.0,VedAstro,92,90,55,75,70,85,90,80
+Pelé,1940-10-21,03:30:00,"Três Corações, Brazil",-22.4419,-45.4627,-3.0,VedAstro,92,95,75,90,80,75,90,85
+Andrew Carnegie,1835-11-25,06:30:00,"Dunfermline, Scotland",56.062,-3.4322,0.0,VedAstro,92,99,70,85,75,75,90,80
+John D. Rockefeller,1839-07-08,11:00:00,"Richford, New York",43.9948,-75.8615,-5.0,VedAstro,90,100,65,80,70,70,88,75
+Henry Ford,1863-07-30,19:30:00,"Wayne County, Michigan",42.315,-83.1234,-5.0,VedAstro,92,98,60,75,75,60,90,75
+Socrates,1469-05-18,12:00:00,"Athens, Greece",37.9838,23.7275,2.0,VedAstro,85,70,55,65,60,95,88,75
+Aristotle,1384-04-23,14:30:00,"Stagira, Greece",40.6524,23.7681,2.0,VedAstro,90,75,65,75,70,90,92,80
+Plato,1427-05-07,10:00:00,"Athens, Greece",37.9838,23.7275,2.0,VedAstro,88,70,60,70,65,95,90,75
+Charlie Chaplin,1889-04-16,03:00:00,"London, England",51.5074,-0.1278,0.0,VedAstro,90,88,60,80,75,80,88,75
+Cary Grant,1904-01-18,01:30:00,"Bristol, England",51.4545,-2.5879,0.0,VedAstro,88,88,70,80,80,70,86,80
+Jane Goodall,1934-04-03,04:00:00,"London, England",51.5074,-0.1278,0.0,VedAstro,88,75,70,75,80,95,87,85
+Richard Dawkins,1941-03-26,20:00:00,"Nairobi, Kenya",-1.2865,36.8172,3.0,VedAstro,90,80,65,70,75,85,88,80
+Margaret Thatcher (verified),1925-10-13,09:00:00,"Grantham, England",52.9141,-0.6437,0.0,VedAstro,92,90,55,70,75,60,90,70
+Vladimir Putin,1952-10-01,09:30:00,"Saint Petersburg, Russia",59.9311,30.3609,3.0,VedAstro,90,85,60,75,80,60,88,70
+Steve Wozniak,1950-08-11,11:00:00,"San Jose, California",37.3382,-121.8863,-8.0,VedAstro,90,85,70,80,80,75,88,80
+Walt Disney,1901-12-05,01:00:00,"Chicago, Illinois",41.8781,-87.6298,-6.0,VedAstro,92,95,65,85,75,80,90,85
+Alfred Hitchcock,1899-08-13,21:00:00,"London, England",51.5074,-0.1278,0.0,VedAstro,90,90,60,70,75,75,88,75
+Orson Welles,1915-05-06,23:15:00,"Kenosha, Wisconsin",42.5834,-87.8206,-6.0,VedAstro,88,85,55,65,70,80,86,70
+Arnold Schwarzenegger,1947-07-30,04:10:00,"Thal, Austria",47.3667,14.75,1.0,VedAstro,92,95,70,85,88,75,90,85
+Bruce Lee,1940-11-27,07:41:00,"San Francisco, California",37.7749,-122.4194,-8.0,VedAstro,95,88,65,80,75,80,92,85
