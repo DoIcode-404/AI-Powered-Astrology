@@ -15,7 +15,6 @@ Ever wondered what the stars have to say about you? This platform takes your bir
 
 ## App Screenshots
 
-> **Note:** Add your app screenshots here to showcase the UI to clients
 
 ### Mobile App (Flutter)
 
@@ -73,25 +72,6 @@ Ever wondered what the stars have to say about you? This platform takes your bir
   </tr>
 </table>
 
-### Web Dashboard
-
-<table>
-  <tr>
-    <td align="center">
-      <img src="screenshots/web_dashboard.png" width="800px" alt="Web Dashboard"/>
-      <br />
-      <b>Web Dashboard View</b>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="screenshots/web_chart.png" width="800px" alt="Web Chart"/>
-      <br />
-      <b>Interactive Birth Chart (Web)</b>
-    </td>
-  </tr>
-</table>
-
 ### Key UI Features
 
 - **Modern Material Design 3** - Clean, intuitive interface with smooth animations
@@ -117,8 +97,6 @@ mkdir screenshots
 # - transits.png
 # - horoscope.png
 # - profile.png
-# - web_dashboard.png
-# - web_chart.png
 ```
 
 ## Tech Stack
