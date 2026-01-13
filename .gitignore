@@ -101,11 +101,11 @@ node_modules/
 *.mp4
 
 # Large binary ML models only (keep code)
-trained_models/*.pkl
-trained_models/*.joblib
-trained_models/*.h5
-trained_models/*.pt
-trained_models/*.pth
+# trained_models/*.pkl
+# trained_models/*.joblib
+# trained_models/*.h5
+# trained_models/*.pt
+# trained_models/*.pth
 
 # Temporary documentation (keep important docs)
 TEMP_*.md
