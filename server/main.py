@@ -169,6 +169,35 @@ async def root():
     )
 
 
+# API Root Endpoint
+@app.get("/api", response_model=APIResponse)
+async def api_root():
+    """
+    API root endpoint for /api base URL.
+
+    Returns:
+        API information
+    """
+    return success_response(
+        data={
+            "api_name": "Kundali Astrology API",
+            "version": "1.0.0",
+            "description": "Comprehensive Vedic Astrology Analysis",
+            "endpoints": {
+                "health": "/health",
+                "auth": "/api/auth",
+                "kundali": "/api/kundali",
+                "export": "/api/export",
+                "predictions": "/api/predictions",
+                "ml": "/api/ml",
+                "compatibility": "/api/compatibility",
+                "transits": "/api/transits"
+            }
+        },
+        message="Welcome to Kundali Astrology API"
+    )
+
+
 # Error Monitoring Endpoint
 @app.get("/error-stats", response_model=APIResponse)
 async def error_stats():
