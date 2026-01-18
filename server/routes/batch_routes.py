@@ -4,7 +4,14 @@ from pydantic import BaseModel
 from typing import List
 from server.services.logic import generate_kundali_logic
 from server.pydantic_schemas.kundali_schema import KundaliRequest
-from server.services.geocoding import geocode_location
+
+# Try to import geocoding, but make it optional
+try:
+    from server.services.geocoding import geocode_location
+    GEOCODING_AVAILABLE = True
+except ImportError:
+    GEOCODING_AVAILABLE = False
+    geocode_location = None
 
 router = APIRouter()
 
@@ -20,6 +27,12 @@ class BatchRequest(BaseModel):
 @router.post('/batch/kundali')
 async def batch_generate_kundali(request: BatchRequest):
     """Generate kundalis for multiple birth records (no DB save)"""
+    if not GEOCODING_AVAILABLE:
+        return {
+            'success': False,
+            'error': 'Geocoding service is not available'
+        }
+    
     results = []
     for record in request.records:
         try:
